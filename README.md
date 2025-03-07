@@ -1,4 +1,4 @@
-# 🚗💩 Car Workshop Simulator 20XX: DELUXE EDITION - README.md
+# 🚗💩 Car Workshop Simulator 20XX: DELUXE EDITION 
 
 **So you wanna be a greasy mechanic, huh? Think you can handle the torque wrench AND the crippling debt? Well, you've come to the right (wrong) place!**
 
