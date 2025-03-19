@@ -1,10 +1,12 @@
 #pragma once
+#include <string>
+
 class task
 {
 public:
-	task();
-	~task();
+	task(); //Constructor
+	~task(); //Destructor
+private:
 
-	
 };
 
