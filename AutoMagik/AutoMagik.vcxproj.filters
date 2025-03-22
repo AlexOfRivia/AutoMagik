@@ -40,24 +40,24 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="task.cpp">
+    <ClCompile Include="src\task.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="worker.cpp">
+    <ClCompile Include="src\worker.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="car.cpp">
+    <ClCompile Include="src\car.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="task.h">
+    <ClInclude Include="header\task.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="worker.h">
+    <ClInclude Include="header\worker.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="car.h">
+    <ClInclude Include="header\car.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

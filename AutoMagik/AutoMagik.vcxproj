@@ -39,11 +39,13 @@
     <QtInstall>6.8.0_msvc2022_64</QtInstall>
     <QtModules>core;gui;widgets</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
+    <AdditionalIncludeDirectories>$(QtInstall)\include;$(QtInstall)\include\QtWidgets;$(QtInstall)\include\QtCore;$(QtInstall)\include\QtGui;$(MSBuildProjectDirectory);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="QtSettings">
     <QtInstall>6.8.0_msvc2022_64</QtInstall>
     <QtModules>core;gui;widgets</QtModules>
     <QtBuildConfig>release</QtBuildConfig>
+    <AdditionalIncludeDirectories>$(QtInstall)\include;$(QtInstall)\include\QtWidgets;$(QtInstall)\include\QtCore;$(QtInstall)\include\QtGui;$(MSBuildProjectDirectory);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
   </PropertyGroup>
   <Target Name="QtMsBuildNotFound" BeforeTargets="CustomBuild;ClCompile" Condition="!Exists('$(QtMsBuild)\qt.targets') or !Exists('$(QtMsBuild)\qt.props')">
     <Message Importance="High" Text="QtMsBuild: could not locate qt.targets, qt.props; project may not build correctly." />
@@ -92,9 +94,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="car.cpp" />
-    <ClCompile Include="task.cpp" />
-    <ClCompile Include="worker.cpp" />
+    <ClCompile Include="src\car.cpp" />
+    <ClCompile Include="src\task.cpp" />
+    <ClCompile Include="src\worker.cpp" />
     <QtRcc Include="AutoMagik.qrc" />
     <QtUic Include="AutoMagik.ui" />
     <QtMoc Include="AutoMagik.h" />
@@ -102,9 +104,14 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="car.h" />
-    <ClInclude Include="task.h" />
-    <ClInclude Include="worker.h" />
+    <ClInclude Include="header\car.h" />
+    <ClInclude Include="header\task.h" />
+    <ClInclude Include="header\worker.h" />
+    <QtUic Include="ui\AutoMagik.ui" />
+    <QtUic Include="ui\welcome_page.ui" />
+    <QtUic Include="settings_dialog.ui" />
+    <QtUic Include="manager_dashboard.ui" />
+    <QtUic Include="add_task_dialog.ui" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">
