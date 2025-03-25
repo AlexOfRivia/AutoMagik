@@ -1,14 +1,14 @@
-#include "worker.h"
+#include "Worker.h"
 
 
 //Constructor
-worker::worker()
+Worker::Worker()
 {
 
 }
 
 //Destructor
-worker::~worker()
+Worker::~Worker()
 {
 
 }

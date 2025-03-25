@@ -1,8 +1,8 @@
 #pragma once
-class worker
+class Worker
 {
 public:
-	worker();
-	~worker();
+	Worker();
+	~Worker();
 };
 

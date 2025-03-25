@@ -92,9 +92,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="car.cpp" />
-    <ClCompile Include="task.cpp" />
-    <ClCompile Include="worker.cpp" />
+    <ClCompile Include="Car.cpp" />
+    <ClCompile Include="Task.cpp" />
+    <ClCompile Include="Worker.cpp" />
     <QtRcc Include="AutoMagik.qrc" />
     <QtUic Include="AutoMagik.ui" />
     <QtMoc Include="AutoMagik.h" />
@@ -102,9 +102,9 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="car.h" />
-    <ClInclude Include="task.h" />
-    <ClInclude Include="worker.h" />
+    <ClInclude Include="Car.h" />
+    <ClInclude Include="Task.h" />
+    <ClInclude Include="Worker.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

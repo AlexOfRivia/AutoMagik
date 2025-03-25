@@ -1,14 +1,14 @@
-#include "car.h"
+#include "Car.h"
 
 
 //Constructor
-car::car()
+Car::Car()
 {
 
 }
 
 //Destructor
-car::~car()
+Car::~Car()
 {
 
 }

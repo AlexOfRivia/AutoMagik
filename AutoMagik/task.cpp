@@ -1,14 +1,14 @@
-#include "task.h"
+#include "Task.h"
 
 
 //Constructor
-task::task()
+Task::Task()
 {
 
 }
 
 //Destructor
-task::~task()
+Task::~Task()
 {
 
 }

@@ -1,11 +1,11 @@
 ﻿#pragma once
 #include <string>
 
-class car
+class Car
 {
 public:
-	car(); //Constructor
-	~car(); //Destructor
+	Car(); //Constructor
+	~Car(); //Destructor
 
 private:
 	std::string carMake; //Make of the car
