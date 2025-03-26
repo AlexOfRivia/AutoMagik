@@ -7,4 +7,6 @@ AutoMagik::AutoMagik(QWidget *parent)
 }
 
 AutoMagik::~AutoMagik()
-{}
+{
+
+}

@@ -1,28 +1,182 @@
-<UI version="4.0" >
- <class>AutoMagikClass</class>
- <widget class="QMainWindow" name="AutoMagikClass" >
-  <property name="objectName" >
-   <string notr="true">AutoMagikClass</string>
-  </property>
-  <property name="geometry" >
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>600</width>
-    <height>400</height>
-   </rect>
-  </property>
-  <property name="windowTitle" >
-   <string>AutoMagik</string>
-  </property>  <widget class="QMenuBar" name="menuBar" />
-  <widget class="QToolBar" name="mainToolBar" />
-  <widget class="QWidget" name="centralWidget" />
-  <widget class="QStatusBar" name="statusBar" />
- </widget>
- <layoutDefault spacing="6" margin="11" />
- <pixmapfunction></pixmapfunction>
- <resources>
-   <include location="AutoMagik.qrc"/>
- </resources>
- <connections/>
-</UI>
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+	<class>AutoMagikClass</class>
+	<widget class="QMainWindow" name="AutoMagikClass">
+		<property name="geometry">
+			<rect>
+				<x>0</x>
+				<y>0</y>
+				<width>900</width>
+				<height>600</height>
+			</rect>
+		</property>
+		<property name="windowTitle">
+			<string>AutoMagik</string>
+		</property>
+		<widget class="QWidget" name="centralWidget">
+			<widget class="QWidget" name="layoutWidget">
+				<property name="geometry">
+					<rect>
+						<x>100</x>
+						<y>500</y>
+						<width>751</width>
+						<height>81</height>
+					</rect>
+				</property>
+				<layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,10,0,0,0,10,0">
+					<property name="spacing">
+						<number>12</number>
+					</property>
+					<property name="sizeConstraint">
+						<enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
+					</property>
+					<property name="bottomMargin">
+						<number>0</number>
+					</property>
+					<item>
+						<spacer name="horizontalSpacer_7">
+							<property name="orientation">
+								<enum>Qt::Orientation::Horizontal</enum>
+							</property>
+							<property name="sizeHint" stdset="0">
+								<size>
+									<width>40</width>
+									<height>40</height>
+								</size>
+							</property>
+						</spacer>
+					</item>
+					<item>
+						<widget class="QPushButton" name="pushButton_5">
+							<property name="sizePolicy">
+								<sizepolicy hsizetype="Ignored" vsizetype="Ignored">
+									<horstretch>0</horstretch>
+									<verstretch>0</verstretch>
+								</sizepolicy>
+							</property>
+							<property name="styleSheet">
+								<string notr="true">
+									QPushButton{
+									font: 700 10pt &quot;Cambria Math&quot;;
+									color: rgba(200,200,200,225);
+									background-color: rgba(4,30,176,255);
+									border-radius: 15px;
+									border-style: outset;
+									border-width: 2px;
+									border-color: rgba(4,30,80,255);
+									}
+									QPushButton:Hover
+									{
+									background-color: rgba(4,30,146,255);
+									border: inset;
+									}
+									QPushButton:Pressed
+									{
+									background-color: rgba(4,30,120,255);
+									border: inset;
+									}
+								</string>
+							</property>
+							<property name="text">
+								<string>Manager</string>
+							</property>
+						</widget>
+					</item>
+					<item>
+						<spacer name="horizontalSpacer">
+							<property name="orientation">
+								<enum>Qt::Orientation::Horizontal</enum>
+							</property>
+							<property name="sizeHint" stdset="0">
+								<size>
+									<width>40</width>
+									<height>20</height>
+								</size>
+							</property>
+						</spacer>
+					</item>
+					<item>
+						<spacer name="horizontalSpacer_2">
+							<property name="orientation">
+								<enum>Qt::Orientation::Horizontal</enum>
+							</property>
+							<property name="sizeHint" stdset="0">
+								<size>
+									<width>40</width>
+									<height>20</height>
+								</size>
+							</property>
+						</spacer>
+					</item>
+					<item>
+						<spacer name="horizontalSpacer_8">
+							<property name="orientation">
+								<enum>Qt::Orientation::Horizontal</enum>
+							</property>
+							<property name="sizeHint" stdset="0">
+								<size>
+									<width>40</width>
+									<height>20</height>
+								</size>
+							</property>
+						</spacer>
+					</item>
+					<item>
+						<widget class="QPushButton" name="pushButton_6">
+							<property name="sizePolicy">
+								<sizepolicy hsizetype="Ignored" vsizetype="Ignored">
+									<horstretch>0</horstretch>
+									<verstretch>0</verstretch>
+								</sizepolicy>
+							</property>
+							<property name="styleSheet">
+								<string notr="true">
+									QPushButton{
+									font: 700 10pt &quot;Cambria Math&quot;;
+									color: rgba(200,200,200,225);
+									background-color: rgba(4,30,176,255);
+									border-radius: 15px;
+									border-style: outset;
+									border-width: 2px;
+									border-color: rgba(4,30,80,255);
+									}
+									QPushButton:Hover
+									{
+									background-color: rgba(4,30,146,255);
+									border: inset;
+									}
+									QPushButton:Pressed
+									{
+									background-color: rgba(4,30,120,255);
+									border: inset;
+									}
+								</string>
+							</property>
+							<property name="text">
+								<string>Worker</string>
+							</property>
+						</widget>
+					</item>
+					<item>
+						<spacer name="horizontalSpacer_9">
+							<property name="orientation">
+								<enum>Qt::Orientation::Horizontal</enum>
+							</property>
+							<property name="sizeHint" stdset="0">
+								<size>
+									<width>40</width>
+									<height>20</height>
+								</size>
+							</property>
+						</spacer>
+					</item>
+				</layout>
+			</widget>
+		</widget>
+	</widget>
+	<layoutdefault spacing="6" margin="11"/>
+	<resources>
+		<include location="AutoMagik.qrc"/>
+	</resources>
+	<connections/>
+</ui>
