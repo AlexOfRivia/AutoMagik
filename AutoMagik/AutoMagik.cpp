@@ -1,5 +1,11 @@
 #include "AutoMagik.h"
 
+/*NOTES
+- Car Info in the dashboard will be all car object info in the task object
+- task info will be instructions and parts needed from the object
+- clicking the add comment button will add a new string into the comment string in the task object
+- In the task widget on the left, there will be a task ID and car make and model*/
+
 AutoMagik::AutoMagik(QWidget *parent)
     : QMainWindow(parent)
 {
@@ -27,6 +33,30 @@ AutoMagik::AutoMagik(QWidget *parent)
 }
 
 AutoMagik::~AutoMagik()
+{
+
+}
+
+//Adding task to table
+void AutoMagik::addTask()
+{
+
+}
+
+//Editing selected task
+void AutoMagik::editSelectedTask()
+{
+
+}
+
+//Assigning or reassigning task
+void AutoMagik::assignReassignTask()
+{
+
+}
+
+//Deleting selected task
+void AutoMagik::deleteTask()
 {
 
 }
