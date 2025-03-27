@@ -1,4 +1,15 @@
-<RCC>
-    <qresource prefix="AutoMagik">
-    </qresource>
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource prefix="/icons">
+    <file alias="app_icon.svg">icons/app_icon.svg</file>
+    <file alias="add.svg">icons/add.svg</file>
+    <file alias="delete.svg">icons/delete.svg</file>
+    <file alias="edit.svg">icons/edit.svg</file>
+    <file alias="person.svg">icons/person.svg</file>
+    <file alias="check.svg">icons/check.svg</file>
+    <file alias="back.svg">icons/back.svg</file>
+    <file alias="manager.svg">icons/manager.svg</file>
+    <file alias="worker.svg">icons/worker.svg</file>
+    <file alias="add_comment.svg">icons/add_comment.svg</file>
+    <!-- Add any other SVG icons you use -->
+</qresource>
 </RCC>
