@@ -13,6 +13,7 @@ private:
 	std::string engineType; //Type of engine
 	int productionYear; //Year the car was produced
 	int carMileage; //Mileage of the car
+	int clientPhoneNumber; //Phone number of the client
 
 
 

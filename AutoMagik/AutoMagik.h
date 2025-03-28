@@ -6,6 +6,11 @@
 #include "Car.h"
 #include "Task.h"
 #include "Worker.h"
+#include <QDialog>
+#include <QDialogButtonBox>
+#include <QSpinBox>
+#include <QSpacerItem>
+#include <QComboBox>
 
 class AutoMagik : public QMainWindow
 {
@@ -19,6 +24,7 @@ private:
     Ui::AutoMagikClass ui;
 
     void addTask(); //Adding task to table
+	void addCar(); //Adding car to table
 	void editSelectedTask(); //Editing selected task
 	void assignReassignTask(); //Assigning or reassigning task
     void deleteTask(); //Deleting tasks from table

@@ -275,7 +275,21 @@
         <item>
          <layout class="QHBoxLayout" name="managerActionsLayout">
           <item>
+           <widget class="QPushButton" name="addCarButton">
+            <property name="text">
+             <string>Add New Car</string>
+            </property>
+            <property name="icon">
+             <iconset>
+              <normaloff>icons/add.svg</normaloff>icons/add.svg</iconset>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QPushButton" name="addTaskButton">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="text">
              <string>Add New Task</string>
             </property>
