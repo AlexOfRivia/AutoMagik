@@ -153,11 +153,19 @@ void AutoMagik::addCar()
 
     QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, &dialog); // Creating a button box
     mainLayout->addWidget(&buttonBox); // Adding the button box to the layout
-    QObject::connect(&buttonBox, &QDialogButtonBox::accepted, &dialog, &QDialog::accept); // Connecting the button box to accept the dialog
+    QObject::connect(&buttonBox, &QDialogButtonBox::accepted, [&]() {
+        if (makeInput->toPlainText().isEmpty() || modelInput->toPlainText().isEmpty() || mileageInput->toPlainText().isEmpty() || engineInput->toPlainText().isEmpty() || phoneNumberInput->toPlainText().isEmpty()) {
+            QMessageBox::warning(&dialog, "Input Error", "All fields must be filled out.");
+        }
+        else {
+            dialog.accept();
+        }
+        });   
     QObject::connect(&buttonBox, &QDialogButtonBox::rejected, &dialog, &QDialog::reject); // Connecting the button box to reject the dialog
     if (dialog.exec() == QDialog::Accepted) // Executing the dialog and checking if it was accepted
     {
-        return;
+        //Error, if one of the fields is empty
+        
     }
 
     if (!cars.empty())

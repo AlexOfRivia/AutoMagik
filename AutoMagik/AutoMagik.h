@@ -12,6 +12,7 @@
 #include <QSpacerItem>
 #include <QComboBox>
 #include <QException>
+#include <QMessageBox>
 
 class AutoMagik : public QMainWindow
 {
