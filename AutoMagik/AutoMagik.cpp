@@ -52,7 +52,21 @@ void AutoMagik::addTask()
 	dialog.setWindowTitle("Add Task");
     QVBoxLayout* mainLayout = new QVBoxLayout(&dialog);
 
+    //I will add a combobox here with a car to choose later
 
+
+
+    if (!tasks.empty())
+    {
+        ui.deleteTaskButton->setEnabled(true);
+        ui.editTaskButton->setEnabled(true);
+        ui.assignTaskButton->setEnabled(true);
+    }
+    else {
+        ui.deleteTaskButton->setEnabled(true);
+        ui.editTaskButton->setEnabled(true);
+        ui.assignTaskButton->setEnabled(true);
+    }
 }
 
 //Adding car to table
@@ -172,4 +186,10 @@ void AutoMagik::assignReassignTask()
 void AutoMagik::deleteTask()
 {
 
+    if (tasks.empty())
+    {
+        ui.deleteTaskButton->setEnabled(false);
+        ui.editTaskButton->setEnabled(false);
+        ui.assignTaskButton->setEnabled(false);
+    } 
 }

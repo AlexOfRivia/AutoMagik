@@ -11,6 +11,7 @@
 #include <QSpinBox>
 #include <QSpacerItem>
 #include <QComboBox>
+#include <QException>
 
 class AutoMagik : public QMainWindow
 {
@@ -30,6 +31,6 @@ private:
     void deleteTask(); //Deleting tasks from table
 
 	std::vector<Car> cars; //Vector of cars
-	std::vector<Task> taks; //Vector of tasks
+	std::vector<Task> tasks; //Vector of tasks
     std::vector<Worker> workers; //Vector of workers
 };
