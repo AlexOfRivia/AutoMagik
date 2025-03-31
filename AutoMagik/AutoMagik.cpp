@@ -56,6 +56,8 @@ void AutoMagik::addTask()
 
 
 
+
+
     if (!tasks.empty())
     {
         ui.deleteTaskButton->setEnabled(true);
@@ -164,7 +166,7 @@ void AutoMagik::addCar()
     QObject::connect(&buttonBox, &QDialogButtonBox::rejected, &dialog, &QDialog::reject); // Connecting the button box to reject the dialog
     if (dialog.exec() == QDialog::Accepted) // Executing the dialog and checking if it was accepted
     {
-        //Error, if one of the fields is empty
+        //TODO: make adding to the vector
         
     }
 
