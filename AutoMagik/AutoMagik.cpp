@@ -65,9 +65,9 @@ void AutoMagik::addTask()
         ui.assignTaskButton->setEnabled(true);
     }
     else {
-        ui.deleteTaskButton->setEnabled(true);
-        ui.editTaskButton->setEnabled(true);
-        ui.assignTaskButton->setEnabled(true);
+        ui.deleteTaskButton->setEnabled(false);
+        ui.editTaskButton->setEnabled(false);
+        ui.assignTaskButton->setEnabled(false);
     }
 }
 
@@ -166,8 +166,18 @@ void AutoMagik::addCar()
     QObject::connect(&buttonBox, &QDialogButtonBox::rejected, &dialog, &QDialog::reject); // Connecting the button box to reject the dialog
     if (dialog.exec() == QDialog::Accepted) // Executing the dialog and checking if it was accepted
     {
-        //TODO: make adding to the vector
-        
+        Car *newCar = new Car();
+        newCar->setCarMake(makeInput->toPlainText().toStdString());
+        newCar->setCarModel(modelInput->toPlainText().toStdString());
+        newCar->setEngineType(engineInput->toPlainText().toStdString());
+        newCar->setCarMileage(mileageInput->toPlainText().toInt());
+        newCar->setProductionYear(yearInput->currentText().toInt());
+        newCar->setClientPhoneNumber(phoneNumberInput->toPlainText().toInt());
+
+        this->cars.push_back(*newCar);
+
+        //Add this car to the car widget or something
+        delete newCar;
     }
 
     if (!cars.empty())
