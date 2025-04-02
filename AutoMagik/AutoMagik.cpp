@@ -132,11 +132,13 @@ void AutoMagik::addTask()
 
     if (!tasks.empty())
     {
+        //Set buttons as visible
         ui.deleteTaskButton->setEnabled(true);
         ui.editTaskButton->setEnabled(true);
         ui.assignTaskButton->setEnabled(true);
     }
     else {
+        //Hide buttons
         ui.deleteTaskButton->setEnabled(false);
         ui.editTaskButton->setEnabled(false);
         ui.assignTaskButton->setEnabled(false);
@@ -254,8 +256,10 @@ void AutoMagik::addCar()
 
     if (!cars.empty())
     {
+        //Show add task button
         ui.addTaskButton->setEnabled(true);
 	} else {
+        //Hide -||-
         ui.addTaskButton->setEnabled(false);
     }
 
@@ -280,6 +284,7 @@ void AutoMagik::deleteTask()
 
     if (tasks.empty())
     {
+        //Hide all buttons task-related buttons when task vector is empty
         ui.deleteTaskButton->setEnabled(false);
         ui.editTaskButton->setEnabled(false);
         ui.assignTaskButton->setEnabled(false);
