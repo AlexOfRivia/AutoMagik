@@ -4,7 +4,8 @@
 - Car Info in the dashboard will be all car object info in the task object
 - task info will be instructions and parts needed from the object
 - clicking the add comment button will add a new string into the comment string in the task object
-- In the task widget on the left, there will be a task ID and car make and model*/
+- In the task widget on the left, there will be a task ID and car make and model
+- In the cars screen, maybe add an option to see in how many task the car is currently in (?)*/
 
 AutoMagik::AutoMagik(QWidget *parent)
     : QMainWindow(parent)
@@ -48,15 +49,77 @@ AutoMagik::~AutoMagik()
 //Adding task to table
 void AutoMagik::addTask()
 {
-    QDialog dialog(this);
-	dialog.setWindowTitle("Add Task");
-    QVBoxLayout* mainLayout = new QVBoxLayout(&dialog);
+    QDialog dialog(this); //Initializing the dialog box
+    dialog.setWindowTitle("Add Task"); //Setting name
+    QVBoxLayout* mainLayout = new QVBoxLayout(&dialog); //Creating main layout
 
-    //I will add a combobox here with a car to choose later
+    QComboBox* carSelection = new QComboBox(&dialog); //Car selection combo box
 
+    for (auto& car : cars) //for each car loop
+    {
+        carSelection->addItem(QString::fromStdString(car.getMake() + " " + car.getModel())); //Adding the car make and model to the combo box 
+    }
 
+    //Task instructions input
+    QTextEdit* instructionsInput = new QTextEdit(&dialog);
+    instructionsInput->setPlaceholderText("Enter task instructions");
 
+    //Parts needed input
+    QTextEdit* partsInput = new QTextEdit(&dialog);
+    partsInput->setPlaceholderText("Enter needed parts");
 
+    //Initial comments input
+    QTextEdit* initialCommentsInput = new QTextEdit(&dialog);
+    initialCommentsInput->setPlaceholderText("Enter comment:");
+
+    //Car selection layout
+    QVBoxLayout* carSelectionLayout = new QVBoxLayout();
+    carSelectionLayout->addWidget(new QLabel("Select a Car to Work On:", &dialog));
+    carSelectionLayout->addWidget(carSelection);
+
+    //instructions and parts label layout
+    QHBoxLayout* labelLayout1 = new QHBoxLayout(&dialog);
+    labelLayout1->addWidget(new QLabel("Task Instructions:", &dialog));
+    labelLayout1->addWidget(new QLabel("Parts Needed:", &dialog));
+
+    //instructions and parts input layout
+    QHBoxLayout* inputLayout1 = new QHBoxLayout(&dialog);
+    inputLayout1->addWidget(instructionsInput);
+    inputLayout1->addWidget(partsInput);
+
+    //comments info
+    QHBoxLayout* labelLayout2 = new QHBoxLayout(&dialog);
+    labelLayout2->addWidget(new QLabel("Initial Comments:", &dialog));
+
+    //make and model input layout
+    QHBoxLayout* inputLayout2 = new QHBoxLayout(&dialog);
+    inputLayout2->addWidget(initialCommentsInput);
+
+    //Adding everything into the main layout
+    mainLayout->addLayout(carSelectionLayout);
+    mainLayout->addLayout(labelLayout1);
+    mainLayout->addLayout(inputLayout1);
+    mainLayout->addLayout(labelLayout2);
+    mainLayout->addLayout(inputLayout2);
+
+    QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, &dialog); // Creating a button box
+    mainLayout->addWidget(&buttonBox); // Adding the button box to the layout
+    QObject::connect(&buttonBox, &QDialogButtonBox::accepted, [&]() 
+        {
+        if (instructionsInput->toPlainText().isEmpty() || partsInput->toPlainText().isEmpty()) //Checking for empty inputs
+        {
+            QMessageBox::warning(&dialog, "Input Error", "All fields must be filled out.");
+        }
+        else {
+            dialog.accept();
+        }
+        });
+    QObject::connect(&buttonBox, &QDialogButtonBox::rejected, &dialog, &QDialog::reject); //Connecting the button box to reject the dialog
+    if (dialog.exec() == QDialog::Accepted) //Executing the dialog and checking if it was accepted
+    {
+        //Create new task
+        //Car will be the indexed from the combobox 
+    }
 
     if (!tasks.empty())
     {
@@ -153,20 +216,21 @@ void AutoMagik::addCar()
     mainLayout->addLayout(labelLayout3);
     mainLayout->addLayout(inputLayout3);
 
-    QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, &dialog); // Creating a button box
-    mainLayout->addWidget(&buttonBox); // Adding the button box to the layout
+    QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, &dialog); //Creating a button box
+    mainLayout->addWidget(&buttonBox); //Adding the button box to the layout
     QObject::connect(&buttonBox, &QDialogButtonBox::accepted, [&]() {
-        if (makeInput->toPlainText().isEmpty() || modelInput->toPlainText().isEmpty() || mileageInput->toPlainText().isEmpty() || engineInput->toPlainText().isEmpty() || phoneNumberInput->toPlainText().isEmpty()) {
+        if (makeInput->toPlainText().isEmpty() || modelInput->toPlainText().isEmpty() || mileageInput->toPlainText().isEmpty() || engineInput->toPlainText().isEmpty() || phoneNumberInput->toPlainText().isEmpty()) 
+        {
             QMessageBox::warning(&dialog, "Input Error", "All fields must be filled out.");
         }
         else {
             dialog.accept();
         }
         });   
-    QObject::connect(&buttonBox, &QDialogButtonBox::rejected, &dialog, &QDialog::reject); // Connecting the button box to reject the dialog
-    if (dialog.exec() == QDialog::Accepted) // Executing the dialog and checking if it was accepted
+    QObject::connect(&buttonBox, &QDialogButtonBox::rejected, &dialog, &QDialog::reject); //Connecting the button box to reject the dialog
+    if (dialog.exec() == QDialog::Accepted) //Executing the dialog and checking if it was accepted
     {
-        Car *newCar = new Car();
+        Car *newCar = new Car(); //Initializing a new car object
         newCar->setCarMake(makeInput->toPlainText().toStdString());
         newCar->setCarModel(modelInput->toPlainText().toStdString());
         newCar->setEngineType(engineInput->toPlainText().toStdString());
@@ -174,10 +238,9 @@ void AutoMagik::addCar()
         newCar->setProductionYear(yearInput->currentText().toInt());
         newCar->setClientPhoneNumber(phoneNumberInput->toPlainText().toInt());
 
-        this->cars.push_back(*newCar);
+        this->cars.push_back(*newCar); //Adding new car object to the cars vector
 
-        //Add this car to the car widget or something
-        delete newCar;
+        delete newCar; //Deleting the temporary new car object
     }
 
     if (!cars.empty())
