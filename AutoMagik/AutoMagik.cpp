@@ -1,8 +1,6 @@
 #include "AutoMagik.h"
 
 /*NOTES
-- Car Info in the dashboard will be all car object info in the task object
-- task info will be instructions and parts needed from the object
 - clicking the add comment button will add a new string into the comment string in the task object
 - In the task widget on the left, there will be a task ID and car make and model
 - In the cars screen, maybe add an option to see in how many task the car is currently in (?)*/
