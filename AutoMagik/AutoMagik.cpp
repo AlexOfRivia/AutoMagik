@@ -121,11 +121,21 @@ void AutoMagik::addTask()
         Task* newTask = new Task;
 
         //Setting task parameters
-        newTask->setTaskID(sizeof(tasks)+1);
+        newTask->setTaskID(int(tasks.size()) + 1);
         newTask->setTaskInstructions(instructionsInput->toPlainText().toStdString());
         newTask->setPartsNeeded(partsInput->toPlainText().toStdString());
         newTask->setComments(initialCommentsInput->toPlainText().toStdString());
         newTask->setTaskCar(cars[carSelection->currentIndex()]);
+
+        this->tasks.push_back(*newTask);
+
+        ui.tasksTableWidget->setRowCount(static_cast<int>(tasks.size()));
+        for (int i = 0; i < static_cast<int>(tasks.size()); i++)
+        {
+            ui.tasksTableWidget->setItem(i, 0, new QTableWidgetItem(QString::number(tasks[i].getTaskID())));
+            ui.tasksTableWidget->setItem(i, 1, new QTableWidgetItem(QString::fromStdString(tasks[i].getTaskCar())));
+            ui.tasksTableWidget->setItem(i, 2, new QTableWidgetItem(QString::fromStdString(tasks[i].getTaskInstructions())));
+        }
 
         delete newTask; //Clearing memory
     }

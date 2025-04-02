@@ -18,7 +18,7 @@ public:
 	std::string getPartsNeeded(); //Get the parts needed for the task
 	std::string getComments(); //Get the comments for the task
 	int getTaskID(); //Get the ID for the task
-	Car getTaskCar(); //Get the car for the task
+	std::string getTaskCar(); //Get the car for the task
 
 
 private:
