@@ -117,8 +117,17 @@ void AutoMagik::addTask()
     QObject::connect(&buttonBox, &QDialogButtonBox::rejected, &dialog, &QDialog::reject); //Connecting the button box to reject the dialog
     if (dialog.exec() == QDialog::Accepted) //Executing the dialog and checking if it was accepted
     {
-        //Create new task
-        //Car will be the indexed from the combobox 
+        //Creatint new task
+        Task* newTask = new Task;
+
+        //Setting task parameters
+        newTask->setTaskID(sizeof(tasks)+1);
+        newTask->setTaskInstructions(instructionsInput->toPlainText().toStdString());
+        newTask->setPartsNeeded(partsInput->toPlainText().toStdString());
+        newTask->setComments(initialCommentsInput->toPlainText().toStdString());
+        newTask->setTaskCar(cars[carSelection->currentIndex()]);
+
+        delete newTask; //Clearing memory
     }
 
     if (!tasks.empty())

@@ -16,31 +16,31 @@ Task::~Task()
 //Setting the instructions for the task
 void Task::setTaskInstructions(std::string instructions)
 {
-
+	this->taskInstructions = instructions;
 }
 
 //Setting the parts needed for the task
 void Task::setPartsNeeded(std::string parts)
 {
-
+	this->partsNeeded = parts;
 }
 
 //Setting the comments for the task
 void Task::setComments(std::string comments)
 {
-
+	this->comments = comments;
 }
 
 //Setting the ID for the task
 void Task::setTaskID(int ID)
 {
-
+	this->taskID = ID;
 }
 
 //Setting the car for the task
-void Task::setTaskCar()
+void Task::setTaskCar(Car car)
 {
-
+	this->taskCar = car;
 }
 
 //Getting the instructions for the task

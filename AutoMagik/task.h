@@ -12,7 +12,7 @@ public:
 	void setPartsNeeded(std::string parts); //Set the parts needed for the task
 	void setComments(std::string comments); //Set the comments for the task
 	void setTaskID(int ID); //Set the ID for the task
-	void setTaskCar(); //Set the car for the task
+	void setTaskCar(Car car); //Set the car for the task
 
 	std::string getTaskInstructions(); //Get the instructions for the task
 	std::string getPartsNeeded(); //Get the parts needed for the task
