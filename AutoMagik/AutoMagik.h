@@ -6,6 +6,13 @@
 #include "Car.h"
 #include "Task.h"
 #include "Worker.h"
+#include <QDialog>
+#include <QDialogButtonBox>
+#include <QSpinBox>
+#include <QSpacerItem>
+#include <QComboBox>
+#include <QException>
+#include <QMessageBox>
 
 class AutoMagik : public QMainWindow
 {
@@ -18,7 +25,13 @@ public:
 private:
     Ui::AutoMagikClass ui;
 
+    void addTask(); //Adding task to table
+	void addCar(); //Adding car to table
+	void editSelectedTask(); //Editing selected task
+	void assignReassignTask(); //Assigning or reassigning task
+    void deleteTask(); //Deleting tasks from table
+
 	std::vector<Car> cars; //Vector of cars
-	std::vector<Task> taks; //Vector of tasks
+	std::vector<Task> tasks; //Vector of tasks
     std::vector<Worker> workers; //Vector of workers
 };
