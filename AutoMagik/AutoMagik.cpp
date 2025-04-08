@@ -3,7 +3,11 @@
 /*NOTES
 - clicking the add comment button will add a new string into the comment string in the task object
 - In the task widget on the left, there will be a task ID and car make and model
-- In the cars screen, maybe add an option to see in how many task the car is currently in (?)*/
+- In the cars screen, maybe add an option to see in how many task the car is currently in (?) 
+
+TODO: 
+- Create a Manager Car and Workers panel (stacked Widget probably)
+- Add other button functionality*/
 
 AutoMagik::AutoMagik(QWidget *parent)
     : QMainWindow(parent)
@@ -130,6 +134,7 @@ void AutoMagik::addTask()
         ui.tasksTableWidget->setRowCount(static_cast<int>(tasks.size()));
         for (int i = 0; i < static_cast<int>(tasks.size()); i++)
         {
+			//Setting items in the table
             ui.tasksTableWidget->setItem(i, 0, new QTableWidgetItem(QString::number(tasks[i].getTaskID())));
             ui.tasksTableWidget->setItem(i, 1, new QTableWidgetItem(QString::fromStdString(tasks[i].getTaskCar())));
             ui.tasksTableWidget->setItem(i, 2, new QTableWidgetItem(QString::fromStdString(tasks[i].getTaskInstructions())));
@@ -158,28 +163,31 @@ void AutoMagik::addCar()
 {
     QDialog dialog(this); //Creating dialog box
     dialog.setWindowTitle("Add Task"); //Setting dialog name
-    dialog.setFixedSize(425,250);
     QVBoxLayout* mainLayout = new QVBoxLayout(&dialog); //Creating main layout
+
+
+    //THIS COMBO BOX IS FOR THE API USAGE
+	QComboBox* carSelection = new QComboBox(&dialog); //Car selection combo box
 
     //Make info input
     QTextEdit* makeInput = new QTextEdit(&dialog);
 	makeInput->setPlaceholderText("Enter car make");
-    makeInput->setStyleSheet("max-height: 30px");
+    makeInput->setStyleSheet("max-height: 35px");
 
     //Model info input
     QTextEdit* modelInput = new QTextEdit(&dialog);
     modelInput->setPlaceholderText("Enter car make");
-    modelInput->setStyleSheet("max-height: 30px");
+    modelInput->setStyleSheet("max-height: 35px");
 
     //Mileage info input:
 	QTextEdit* mileageInput = new QTextEdit(&dialog);
 	mileageInput->setPlaceholderText("Enter car mileage");
-    mileageInput->setStyleSheet("max-height: 30px");
+    mileageInput->setStyleSheet("max-height: 35px");
 
     //Engine info input
     QTextEdit* engineInput = new QTextEdit(&dialog);
     engineInput->setPlaceholderText("Enter engine version");
-    engineInput->setStyleSheet("max-height: 30px");
+    engineInput->setStyleSheet("max-height: 35px");
 
     //Year info input:
     QComboBox* yearInput = new QComboBox(&dialog);
@@ -191,7 +199,7 @@ void AutoMagik::addCar()
     //Phone number info input:
     QTextEdit* phoneNumberInput = new QTextEdit(&dialog);
 	phoneNumberInput->setPlaceholderText("Enter client phone number");
-    phoneNumberInput->setStyleSheet("max-height: 30px;max-width: 195px");
+    phoneNumberInput->setStyleSheet("max-height: 35px;");
 
     //Spcaer
 	QSpacerItem* spacer = new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -228,6 +236,8 @@ void AutoMagik::addCar()
     inputLayout3->addWidget(phoneNumberInput);
    
     //Adding everything into the main layout
+	mainLayout->addWidget(new QLabel("Select a Car to Work On:", &dialog));
+	mainLayout->addWidget(carSelection);
     mainLayout->addLayout(labelLayout1);
     mainLayout->addLayout(inputLayout1);
     mainLayout->addLayout(labelLayout2);
@@ -250,6 +260,8 @@ void AutoMagik::addCar()
     if (dialog.exec() == QDialog::Accepted) //Executing the dialog and checking if it was accepted
     {
         Car *newCar = new Car(); //Initializing a new car object
+
+        //Setting new car object parameters
         newCar->setCarMake(makeInput->toPlainText().toStdString());
         newCar->setCarModel(modelInput->toPlainText().toStdString());
         newCar->setEngineType(engineInput->toPlainText().toStdString());
