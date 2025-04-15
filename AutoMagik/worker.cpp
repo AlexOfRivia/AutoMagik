@@ -4,7 +4,7 @@
 //Constructor
 Worker::Worker()
 {
-
+	this->clockedIn = false;
 }
 
 //Destructor

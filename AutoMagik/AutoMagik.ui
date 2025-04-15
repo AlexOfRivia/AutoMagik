@@ -357,7 +357,7 @@
           <item>
            <widget class="QPushButton" name="managerBackButton">
             <property name="text">
-             <string>Back to Mode Select</string>
+             <string>Sign Out</string>
             </property>
             <property name="icon">
              <iconset resource="AutoMagik.qrc">
@@ -410,7 +410,7 @@
           <item>
            <widget class="QPushButton" name="workerBackButton">
             <property name="text">
-             <string>Back to Mode Select</string>
+             <string>Sign Out</string>
             </property>
             <property name="icon">
              <iconset resource="AutoMagik.qrc">

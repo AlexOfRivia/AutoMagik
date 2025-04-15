@@ -289,7 +289,7 @@ void AutoMagik::addCar()
 //Editing selected task
 void AutoMagik::editSelectedTask()
 {
-
+    
 }
 
 //Assigning or reassigning task
