@@ -10,8 +10,9 @@ public:
 
 private:
 	int workerID=0; //ID of the worker
+	bool clockedIn; //Clocked in status
 	std::string workerName; //Name of the worker
-	std::string workerPosition; //Position of the worker
+	std::string position; //Position of the worker
 	int workerSalary; //Salary of the worker
 	int workerExperience; //Experience of the worker
 	int workerAge; //Age of the worker

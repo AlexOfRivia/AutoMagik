@@ -7,6 +7,7 @@
 
 TODO: 
 - Create a Manager Car and Workers panel (stacked Widget probably)
+- Add firebase functionality
 - Add other button functionality*/
 
 AutoMagik::AutoMagik(QWidget *parent)
@@ -14,14 +15,36 @@ AutoMagik::AutoMagik(QWidget *parent)
 {
     ui.setupUi(this);
 
-    //Showing the managerDashboardPage 
+	ui.stackedWidget->setCurrentIndex(0); //Setting the current index to 0 (home menu)
+
+    //Showing the manager login page 
     QObject::connect(
-        ui.managerModeButton, &QPushButton::clicked, [this]() { ui.stackedWidget->setCurrentIndex(1); }
+        ui.managerModeButton, &QPushButton::clicked, [this]() { ui.stackedWidget->setCurrentIndex(2); }
     );
 
-	//Showing the workerDashboardPage
+	//Showing the worker login page
     QObject::connect(
-        ui.workerModeButton, &QPushButton::clicked, [this]() { ui.stackedWidget->setCurrentIndex(2); }
+        ui.workerModeButton, &QPushButton::clicked, [this]() { ui.stackedWidget->setCurrentIndex(1); }
+    );
+
+    //Returning to mode selection
+    QObject::connect(
+        ui.backButton1, &QPushButton::clicked, [this]() { ui.stackedWidget->setCurrentIndex(0); } //Returning to home menu
+    );
+
+    //Showing the workerDashboardPage
+    QObject::connect(
+        ui.managerLoginButton, &QPushButton::clicked, [this]() { ui.stackedWidget->setCurrentIndex(3); } //Will add a login function with firebase here
+    );
+
+    //Returning to mode selection
+    QObject::connect(
+        ui.backButton2, &QPushButton::clicked, [this]() { ui.stackedWidget->setCurrentIndex(0); } //Returning to home menu
+    );
+
+    //Showing the workerDashboardPage
+    QObject::connect(
+        ui.workerLoginButton, &QPushButton::clicked, [this]() { ui.stackedWidget->setCurrentIndex(4); } //Will add a login function with firebase here
     );
 
 	//Returning to the main page
@@ -289,7 +312,7 @@ void AutoMagik::addCar()
 //Editing selected task
 void AutoMagik::editSelectedTask()
 {
-
+    
 }
 
 //Assigning or reassigning task
