@@ -19,7 +19,7 @@ AutoMagik::AutoMagik(QWidget *parent)
 
     //Showing the manager login page 
     QObject::connect(
-        ui.managerModeButton, &QPushButton::clicked, [this]() { ui.stackedWidget->setCurrentIndex(2); }
+        ui.managerModeButton, &QPushButton::clicked, [this]() { ui.stackedWidget->setCurrentIndex(3); }
     );
 
 	//Showing the worker login page
@@ -34,7 +34,7 @@ AutoMagik::AutoMagik(QWidget *parent)
 
     //Showing the workerDashboardPage
     QObject::connect(
-        ui.managerLoginButton, &QPushButton::clicked, [this]() { ui.stackedWidget->setCurrentIndex(3); } //Will add a login function with firebase here
+        ui.managerLoginButton, &QPushButton::clicked, [this]() { ui.stackedWidget->setCurrentIndex(4); } //Will add a login function with firebase here
     );
 
     //Returning to mode selection
@@ -42,9 +42,24 @@ AutoMagik::AutoMagik(QWidget *parent)
         ui.backButton2, &QPushButton::clicked, [this]() { ui.stackedWidget->setCurrentIndex(0); } //Returning to home menu
     );
 
+    //Showing register page
+    QObject::connect(
+        ui.createManagerAccButton, &QPushButton::clicked, [this]() { ui.stackedWidget->setCurrentIndex(2); } //Returning to home menu
+    );
+
+    //Showing register page
+    QObject::connect(
+        ui.registerButton, &QPushButton::clicked, [this]() { ui.stackedWidget->setCurrentIndex(4); } //Returning to home menu
+    );
+
+    //Returning to manager login
+    QObject::connect(
+        ui.backButton3, &QPushButton::clicked, [this]() { ui.stackedWidget->setCurrentIndex(3); } //Returning to home menu
+    );
+
     //Showing the workerDashboardPage
     QObject::connect(
-        ui.workerLoginButton, &QPushButton::clicked, [this]() { ui.stackedWidget->setCurrentIndex(4); } //Will add a login function with firebase here
+        ui.workerLoginButton, &QPushButton::clicked, [this]() { ui.stackedWidget->setCurrentIndex(5); } //Will add a login function with firebase here
     );
 
 	//Returning to the main page
