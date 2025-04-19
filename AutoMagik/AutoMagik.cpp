@@ -6,9 +6,9 @@
 - In the cars screen, maybe add an option to see in how many task the car is currently in (?) 
 
 TODO: 
-- Create a Manager Car and Workers panel (stacked Widget probably)
 - Add firebase functionality
-- Add other button functionality*/
+- Add other button functionality
+- Add setting task status (enum probably)*/
 
 AutoMagik::AutoMagik(QWidget *parent)
     : QMainWindow(parent)
@@ -22,6 +22,16 @@ AutoMagik::AutoMagik(QWidget *parent)
         ui.managerModeButton, &QPushButton::clicked, [this]() { ui.stackedWidget->setCurrentIndex(3); }
     );
 
+    //Showing the manager login page 
+    QObject::connect(
+        ui.managerBackButton2, &QPushButton::clicked, [this]() { ui.stackedWidget->setCurrentIndex(3); }
+    );
+
+    //Showing the manager login page 
+    QObject::connect(
+        ui.managerBackButton3, &QPushButton::clicked, [this]() { ui.stackedWidget->setCurrentIndex(3); }
+    );
+
 	//Showing the worker login page
     QObject::connect(
         ui.workerModeButton, &QPushButton::clicked, [this]() { ui.stackedWidget->setCurrentIndex(1); }
@@ -32,7 +42,7 @@ AutoMagik::AutoMagik(QWidget *parent)
         ui.backButton1, &QPushButton::clicked, [this]() { ui.stackedWidget->setCurrentIndex(0); } //Returning to home menu
     );
 
-    //Showing the workerDashboardPage
+    //Showing the managerDashboardPage
     QObject::connect(
         ui.managerLoginButton, &QPushButton::clicked, [this]() { ui.stackedWidget->setCurrentIndex(4); } //Will add a login function with firebase here
     );
@@ -44,17 +54,48 @@ AutoMagik::AutoMagik(QWidget *parent)
 
     //Showing register page
     QObject::connect(
-        ui.createManagerAccButton, &QPushButton::clicked, [this]() { ui.stackedWidget->setCurrentIndex(2); } //Returning to home menu
+        ui.createManagerAccButton, &QPushButton::clicked, [this]() { ui.stackedWidget->setCurrentIndex(2); } 
+    );
+
+    //Showing cars page
+	QObject::connect(
+		ui.carsButton, &QPushButton::clicked, [this]() { ui.stackedWidget->setCurrentIndex(6); } 
+	);
+
+    //Showing cars page
+    QObject::connect(
+        ui.carsButton2, &QPushButton::clicked, [this]() { ui.stackedWidget->setCurrentIndex(6); }
+    );
+
+    //Showing tasks page
+    QObject::connect(
+        ui.tasksButton, &QPushButton::clicked, [this]() { ui.stackedWidget->setCurrentIndex(4); } 
+    );
+
+    //Showing tasks page
+    QObject::connect(
+        ui.tasksButton2, &QPushButton::clicked, [this]() { ui.stackedWidget->setCurrentIndex(4); }
+    );
+
+    //Showing workers page
+    QObject::connect(
+        ui.workersButton, &QPushButton::clicked, [this]() { ui.stackedWidget->setCurrentIndex(7); }
+    );
+
+    //Showing workers page
+    QObject::connect(
+        ui.workersButton2, &QPushButton::clicked, [this]() { ui.stackedWidget->setCurrentIndex(7); }
     );
 
     //Showing register page
     QObject::connect(
-        ui.registerButton, &QPushButton::clicked, [this]() { ui.stackedWidget->setCurrentIndex(4); } //Returning to home menu
+        ui.registerButton, &QPushButton::clicked, [this]() { ui.stackedWidget->setCurrentIndex(4); }
+
     );
 
     //Returning to manager login
     QObject::connect(
-        ui.backButton3, &QPushButton::clicked, [this]() { ui.stackedWidget->setCurrentIndex(3); } //Returning to home menu
+        ui.backButton3, &QPushButton::clicked, [this]() { ui.stackedWidget->setCurrentIndex(3); } 
     );
 
     //Showing the workerDashboardPage
@@ -64,12 +105,12 @@ AutoMagik::AutoMagik(QWidget *parent)
 
 	//Returning to the main page
     QObject::connect(
-        ui.workerBackButton, &QPushButton::clicked, [this]() { ui.stackedWidget->setCurrentIndex(0); }
+        ui.workerBackButton, &QPushButton::clicked, [this]() { ui.stackedWidget->setCurrentIndex(0); } //Returning to home menu
     );
 
     //Returning to the main page
     QObject::connect(
-        ui.managerBackButton, &QPushButton::clicked, [this]() { ui.stackedWidget->setCurrentIndex(0); }
+        ui.managerBackButton, &QPushButton::clicked, [this]() { ui.stackedWidget->setCurrentIndex(0); } //Returning to home menu
     );
 
     QObject::connect(
@@ -169,6 +210,9 @@ void AutoMagik::addTask()
 
         this->tasks.push_back(*newTask);
 
+
+		//TODO: Automatically assign the task status as "new" when created
+
         ui.tasksTableWidget->setRowCount(static_cast<int>(tasks.size()));
         for (int i = 0; i < static_cast<int>(tasks.size()); i++)
         {
@@ -186,7 +230,10 @@ void AutoMagik::addTask()
         //Set buttons as visible
         ui.deleteTaskButton->setEnabled(true);
         ui.editTaskButton->setEnabled(true);
-        ui.assignTaskButton->setEnabled(true);
+        if (!this->workers.empty())
+        {
+            ui.assignTaskButton->setEnabled(true);
+        }
     }
     else {
         //Hide buttons
@@ -308,6 +355,8 @@ void AutoMagik::addCar()
         newCar->setClientPhoneNumber(phoneNumberInput->toPlainText().toInt());
 
         this->cars.push_back(*newCar); //Adding new car object to the cars vector
+
+		//Adding new car to the table widget
 
         delete newCar; //Deleting the temporary new car object
     }
