@@ -13,25 +13,32 @@
 #include <QComboBox>
 #include <QException>
 #include <QMessageBox>
+#include <QLineEdit>     
+#include <QFormLayout>   
 
 class AutoMagik : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    AutoMagik(QWidget *parent = nullptr);
+    AutoMagik(QWidget* parent = nullptr);
     ~AutoMagik();
+
+private slots: /*slots are special member functions in Qt that can be connected to signals, when a signal is emitted,
+               any connected slots are automatically invoked, imo useful*/
+
+    void addCar();
+    void addWorker(); 
+	void addTask();
+    void editSelectedTask(); //Placeholder
+    void assignReassignTask(); //Placeholder
+    void deleteTask(); //Placeholder
+    void updateManagerTables(); 
 
 private:
     Ui::AutoMagikClass ui;
 
-    void addTask(); //Adding task to table
-	void addCar(); //Adding car to table
-	void editSelectedTask(); //Editing selected task
-	void assignReassignTask(); //Assigning or reassigning task
-    void deleteTask(); //Deleting tasks from table
-
-	std::vector<Car> cars; //Vector of cars
-	std::vector<Task> tasks; //Vector of tasks
-    std::vector<Worker> workers; //Vector of workers
+    std::vector<Car> cars;
+    std::vector<Task> tasks;
+    std::vector<Worker> workers;
 };

@@ -44,31 +44,31 @@ void Task::setTaskCar(Car car)
 }
 
 //Getting the instructions for the task
-std::string Task::getTaskInstructions()
+std::string Task::getTaskInstructions() const
 {
 	return this->taskInstructions;
 }
 
 //Getting the parts needed for the task
-std::string Task::getPartsNeeded()
+std::string Task::getPartsNeeded() const
 {
 	return this->partsNeeded;
 }
 
 //Getting the comments for the task
-std::string Task::getComments()
+std::string Task::getComments() const
 {
 	return this->comments;
 }
 
 //Getting the ID for the task
-int Task::getTaskID()
+int Task::getTaskID() const
 {
 	return this->taskID;
 }
 
 //Getting the car for the task
-std::string Task::getTaskCar()
+std::string Task::getTaskCar() const
 {
 	return this->taskCar.getMake() + " " + this->taskCar.getModel();
 }
