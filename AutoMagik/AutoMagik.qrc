@@ -10,6 +10,6 @@
     <file alias="manager.svg">icons/manager.svg</file>
     <file alias="worker.svg">icons/worker.svg</file>
     <file alias="add_comment.svg">icons/add_comment.svg</file>
-    <!-- Add any other SVG icons you use -->
+	<file alias="info.svg">icons/info.svg</file>
 </qresource>
 </RCC>

@@ -72,3 +72,9 @@ std::string Task::getTaskCar() const
 {
 	return this->taskCar.getMake() + " " + this->taskCar.getModel();
 }
+
+//Getting the actual car object for the task
+const Car& Task::getCarObject() const
+{
+	return this->taskCar;
+}
