@@ -46,7 +46,7 @@
     <QtBuildConfig>debug</QtBuildConfig>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="QtSettings">
-    <QtInstall>qt 6.8.3 msvc</QtInstall>
+    <QtInstall>qt 6.8.0 msvc</QtInstall>
     <QtModules>core;gui;network;widgets;webview;webenginewidgets</QtModules>
     <QtBuildConfig>release</QtBuildConfig>
   </PropertyGroup>
