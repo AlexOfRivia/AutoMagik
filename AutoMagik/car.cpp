@@ -49,12 +49,33 @@ void Car::setClientPhoneNumber(int phoneNumber)
     this->clientPhoneNumber = phoneNumber;
 }
 
-std::string Car::getMake()
+//Setters
+std::string Car::getMake() const
 {
     return this->carMake;
 }
 
-std::string Car::getModel()
+std::string Car::getModel() const
 {
     return this->carModel;
+}
+
+std::string Car::getEngineType() const
+{
+    return this->engineType;
+}
+
+int Car::getProductionYear() const
+{
+    return this->productionYear;
+}
+
+int Car::getCarMileage() const
+{
+    return this->carMileage;
+}
+
+int Car::getClientPhoneNumber() const
+{
+    return this->clientPhoneNumber;
 }

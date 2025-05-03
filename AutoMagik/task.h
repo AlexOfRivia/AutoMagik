@@ -14,11 +14,12 @@ public:
 	void setTaskID(int ID); //Set the ID for the task
 	void setTaskCar(Car car); //Set the car for the task
 
-	std::string getTaskInstructions(); //Get the instructions for the task
-	std::string getPartsNeeded(); //Get the parts needed for the task
-	std::string getComments(); //Get the comments for the task
-	int getTaskID(); //Get the ID for the task
-	std::string getTaskCar(); //Get the car for the task
+	std::string getTaskInstructions() const; //Get the instructions for the task
+	std::string getPartsNeeded() const; //Get the parts needed for the task
+	std::string getComments() const; //Get the comments for the task
+	int getTaskID() const; //Get the ID for the task
+	std::string getTaskCar() const; //Get the car for the task (Make + Model string)
+	const Car& getCarObject() const; //Get the actual Car object
 
 
 private:
@@ -28,4 +29,3 @@ private:
 	int taskID = 0; //ID of the task
 	Car taskCar; //Car to be worked on
 };
-
