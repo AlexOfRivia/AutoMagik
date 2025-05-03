@@ -7,6 +7,7 @@ public:
 	Car(); //Constructor
 	~Car(); //Destructor
 
+	//Setters
 	void setCarMake(std::string make); //Setting the make of the car
 	void setCarModel(std::string model); //Setting the model of the car
 	void setEngineType(std::string engine); //Setting the engine type of the car
@@ -14,6 +15,7 @@ public:
 	void setCarMileage(int mileage); //Setting the mileage of the car
 	void setClientPhoneNumber(int phoneNumber); //Setting the client phone number
 
+	//Getters
 	std::string getMake() const;
 	std::string getModel() const;
 	std::string getEngineType() const;       

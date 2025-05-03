@@ -162,9 +162,9 @@ void AutoMagik::updateManagerTables()
         ui.tasksTableWidget->setItem(i, 1, new QTableWidgetItem(carDisplay));
         ui.tasksTableWidget->setItem(i, 2, new QTableWidgetItem(QString::fromStdString(task.getTaskInstructions())));
         //Placeholders - need actual task status/worker/priority fields and logic
-        ui.tasksTableWidget->setItem(i, 3, new QTableWidgetItem(QLatin1String("New"))); //Placeholder Status
-        ui.tasksTableWidget->setItem(i, 4, new QTableWidgetItem(QLatin1String("Unassigned"))); //Placeholder Worker
-        ui.tasksTableWidget->setItem(i, 5, new QTableWidgetItem(QLatin1String("Normal"))); //Placeholder Priority
+        ui.tasksTableWidget->setItem(i, 3, new QTableWidgetItem(QString::fromStdString(task.getTaskStatus()))); //setting status
+		ui.tasksTableWidget->setItem(i, 4, new QTableWidgetItem(QString::fromStdString("Unsigned"))); //setting parts needed
+        ui.tasksTableWidget->setItem(i, 5, new QTableWidgetItem(QString::fromStdString(task.getTaskPriority()))); //Placeholder Priority
     }
     ui.tasksTableWidget->resizeColumnsToContents();
 
@@ -309,6 +309,11 @@ void AutoMagik::addTask()
             QVariant::fromValue(static_cast<int>(i))); //Store index in data role
     }
 
+	//Priority combo box
+	QComboBox* priorityComboBox = new QComboBox(&dialog);
+	priorityComboBox->addItem(QLatin1String("Low"), QVariant::fromValue(LOW));
+	priorityComboBox->addItem(QLatin1String("Medium"), QVariant::fromValue(MEDIUM));
+	priorityComboBox->addItem(QLatin1String("High"), QVariant::fromValue(HIGH));
 
     QTextEdit* instructionsInput = new QTextEdit(&dialog);
     instructionsInput->setPlaceholderText(QLatin1String("Enter task instructions (required)"));
@@ -320,8 +325,10 @@ void AutoMagik::addTask()
     initialCommentsInput->setPlaceholderText(QLatin1String("Enter initial comments (optional)"));
     initialCommentsInput->setMinimumHeight(60);
 
-
     QFormLayout* form = new QFormLayout(); //Form layout for car selection
+    form->addRow(new QLabel(QLatin1String("Select Priority:"),&dialog));
+    form->addWidget(priorityComboBox);
+    
     form->addRow(new QLabel(QLatin1String("Select Car:"), &dialog), carSelection);
     mainLayout->addLayout(form);
 
@@ -354,6 +361,9 @@ void AutoMagik::addTask()
         newTask.setPartsNeeded(partsInput->toPlainText().trimmed().toStdString());
         newTask.setComments(initialCommentsInput->toPlainText().trimmed().toStdString());
 
+		priority selectedPriority = static_cast<priority>(priorityComboBox->currentData().toInt());
+		newTask.setTaskPriority(selectedPriority); //Set selected priority;
+
         int selectedCarDataIndex = carSelection->currentData().toInt(); //Get stored index
         if (selectedCarDataIndex >= 0 && selectedCarDataIndex < static_cast<int>(cars.size())) {
             newTask.setTaskCar(cars[selectedCarDataIndex]); //Assign selected car by reference/copy
@@ -363,9 +373,7 @@ void AutoMagik::addTask()
             return; //Should not happen if populated correctly
         }
 
-        //Set default status, priority etc. (implement Task members for these)
-        //e.g. newTask.setStatus(Task::Status::New);
-        //newTask.setPriority(Task::Priority::Normal);
+        newTask.setTaskStatus(NEW); //Set default status to NEW
 
         tasks.push_back(newTask);
 
