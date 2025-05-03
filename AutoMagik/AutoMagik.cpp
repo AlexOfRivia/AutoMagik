@@ -614,13 +614,15 @@ void AutoMagik::updateWorkerDashboardSelection()
 //-----------------------API Call Trigger-----------------------------
 void AutoMagik::showCarInfo()
 {
-    if (currentWorkerTaskIndex < 0 || currentWorkerTaskIndex >= static_cast<int>(tasks.size())) {
+    if (currentWorkerTaskIndex < 0 || currentWorkerTaskIndex >= static_cast<int>(tasks.size())) 
+    {
         QMessageBox::warning(this, QLatin1String("No Task Selected"), QLatin1String("Please select a task from the list first."));
         return;
     }
 
     //Check if requests are already running for this button
-    if (nhtsaRequestPending || apiNinjaRequestPending) {
+    if (nhtsaRequestPending || apiNinjaRequestPending) 
+    {
         qDebug() << "Car info request already in progress.";
         return; //Prevent multiple simultaneous requests from the same button click
     }
@@ -672,8 +674,7 @@ void AutoMagik::showCarInfo()
         QNetworkReply* ninjaReply = networkManager->get(ninjaRequest);
         apiNinjaRequestPending = true; //Mark as pending
         connect(ninjaReply, &QNetworkReply::finished, this, &AutoMagik::handleApiNinjaReplyFinished);
-    }
-    else {
+    } else {
         qDebug() << "API Ninjas key missing or placeholder. Skipping API Ninjas request.";
         //No request started, so it's not pending. apiNinjaRequestPending remains false
         //Check immediately in case NHTSA also finishes instantly or fails before sending
@@ -953,6 +954,7 @@ void AutoMagik::displayCarInfoDialog()
 
         QString searchTerm = QString("%1 %2 %3").arg(displayMake, displayModel.split(' ').first(), QString::number(displayYear));
 
+		//Creating the image search URL
         QUrl url("https://commons.wikimedia.org/w/api.php");
         QUrlQuery query;
         query.addQueryItem("action", "query");
