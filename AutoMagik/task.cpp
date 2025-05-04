@@ -109,10 +109,9 @@ std::string Task::getTaskPriority() const
 {
 	switch (this->taskPriority)
 	{
-	case NEW: return "New";
-	case IN_PROGRESS: return "In Progress";
-	case COMPLETED: return "Completed";
-	case CANCELLED: return "Cancelled";
+	case LOW: return "Low";
+	case MEDIUM: return "Medium";
+	case HIGH: return "High";
 	default: return "Unknown";
 	}
 }
