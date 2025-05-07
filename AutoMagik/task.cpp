@@ -4,7 +4,7 @@
 //Constructor
 Task::Task()
 {
-
+	this->workerID = 0; //Default worker ID
 }
 
 //Destructor
@@ -43,6 +43,11 @@ void Task::setTaskCar(Car car)
 	this->taskCar = car;
 }
 
+void Task::setTaskWorkerID(int id)
+{
+	this->workerID = id;
+}
+
 //Setting the status of the task
 void Task::setTaskStatus(status stat)
 {
@@ -77,6 +82,11 @@ std::string Task::getComments() const
 int Task::getTaskID() const
 {
 	return this->taskID;
+}
+
+int Task::getTaskWorkerID() const
+{
+	return this->workerID;
 }
 
 //Getting the car for the task

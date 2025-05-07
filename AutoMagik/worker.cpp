@@ -86,8 +86,9 @@ bool Worker::isClockedIn() const {
 }
 
 std::string Worker::getAssignedTaskInfo() const {
-    if (hasTask) {
-        return "Task ID: " + std::to_string(assignedTask.getTaskID());
+    if (hasTask) 
+    {
+        return assignedTask.getTaskCar() + ", " + assignedTask.getTaskInstructions();
     }
     else {
         return "None";

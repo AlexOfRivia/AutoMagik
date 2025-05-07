@@ -1,4 +1,4 @@
-#include "AutoMagik.h"
+﻿#include "AutoMagik.h"
 #include "ui_AutoMagik.h"
 #include <QTextEdit>
 #include <QLabel>
@@ -36,11 +36,6 @@
 #include <QtCore5Compat/QRegExp> 
 #endif
 
-
-/*
-TODO:
-     TEST THIS THOROUGHLY AND MAKE A TODO LIST OF CHANGES, ADDITIONS AND BUG FIXES THAT NEED TO BE IMPLEMENTED
-*/
 
 
 AutoMagik::AutoMagik(QWidget* parent)
@@ -84,17 +79,23 @@ AutoMagik::AutoMagik(QWidget* parent)
     QObject::connect(ui.tasksButton, &QPushButton::clicked, [this]() { ui.stackedWidget->setCurrentIndex(4); });       //To Tasks Page
     QObject::connect(ui.workersButton2, &QPushButton::clicked, [this]() { ui.stackedWidget->setCurrentIndex(7); });    //To Workers Page
     QObject::connect(ui.addCarButton, &QPushButton::clicked, this, &AutoMagik::addCar);                             //Add Car Action
+	QObject::connect(ui.editCarButton, &QPushButton::clicked, this, &AutoMagik::editSelectedCar);                   //Edit Car Action
+	QObject::connect(ui.deleteCarButton, &QPushButton::clicked, this, &AutoMagik::deleteSelectedCar);                 //Delete Car Action
     //Manager Tasks Page
-    QObject::connect(ui.managerBackButton, &QPushButton::clicked, [this]() { ui.stackedWidget->setCurrentIndex(0); });  //Blah blah blah you get it, im not gonna comment this much XD
+    QObject::connect(ui.managerBackButton, &QPushButton::clicked, [this]() { ui.stackedWidget->setCurrentIndex(0); }); //Blah blah blah you get it, im not gonna comment this much XD
     QObject::connect(ui.carsButton, &QPushButton::clicked, [this]() { ui.stackedWidget->setCurrentIndex(6); });
     QObject::connect(ui.workersButton, &QPushButton::clicked, [this]() { ui.stackedWidget->setCurrentIndex(7); });
     QObject::connect(ui.addTaskButton, &QPushButton::clicked, this, &AutoMagik::addTask);
+	QObject::connect(ui.editTaskButton, &QPushButton::clicked, this, &AutoMagik::editSelectedTask);                   //Edit Task Action
+	QObject::connect(ui.deleteTaskButton, &QPushButton::clicked, this, &AutoMagik::deleteTask);                       //Delete Task Action
+	QObject::connect(ui.assignTaskButton, &QPushButton::clicked, this, &AutoMagik::assignReassignTask);               //Assign Task Action
     //Manager Workers Page
     QObject::connect(ui.managerBackButton3, &QPushButton::clicked, [this]() { ui.stackedWidget->setCurrentIndex(0); });
     QObject::connect(ui.carsButton2, &QPushButton::clicked, [this]() { ui.stackedWidget->setCurrentIndex(6); });
     QObject::connect(ui.tasksButton2, &QPushButton::clicked, [this]() { ui.stackedWidget->setCurrentIndex(4); });
     QObject::connect(ui.addWorkerButton, &QPushButton::clicked, this, &AutoMagik::addWorker);
-
+	QObject::connect(ui.editWorkerButton, &QPushButton::clicked, this, &AutoMagik::editSelectedWorker);               //Edit Worker Action
+	QObject::connect(ui.deleteWorkerButton, &QPushButton::clicked, this, &AutoMagik::deleteSelectedWorker);           //Delete Worker Action
 
     //Worker
     //Worker Login Page
@@ -161,10 +162,23 @@ void AutoMagik::updateManagerTables()
         QString carDisplay = QString::fromStdString(task.getCarObject().getMake() + " " + task.getCarObject().getModel());
         ui.tasksTableWidget->setItem(i, 1, new QTableWidgetItem(carDisplay));
         ui.tasksTableWidget->setItem(i, 2, new QTableWidgetItem(QString::fromStdString(task.getTaskInstructions())));
-        //Placeholders - need actual task status/worker/priority fields and logic
         ui.tasksTableWidget->setItem(i, 3, new QTableWidgetItem(QString::fromStdString(task.getTaskStatus()))); //setting status
-		ui.tasksTableWidget->setItem(i, 4, new QTableWidgetItem(QString::fromStdString("Unsigned"))); //setting parts needed
-        ui.tasksTableWidget->setItem(i, 5, new QTableWidgetItem(QString::fromStdString(task.getTaskPriority()))); //Placeholder Priority
+
+        //Setting task worker
+		if (task.getTaskWorkerID() != 0) //If worker ID is not 0, set the worker name
+		{
+			for (const auto& worker : workers)
+			{
+				if (worker.getWorkerID() == task.getTaskWorkerID())
+				{
+					ui.tasksTableWidget->setItem(i, 4, new QTableWidgetItem(QString::fromStdString(worker.getWorkerName())));
+					break;
+				}
+			}
+        } else {
+    		ui.tasksTableWidget->setItem(i, 4, new QTableWidgetItem(QString::fromStdString("Unsigned"))); //Setting to unsigned if no worker assigned
+        }
+        ui.tasksTableWidget->setItem(i, 5, new QTableWidgetItem(QString::fromStdString(task.getTaskPriority()))); //Priority
     }
     ui.tasksTableWidget->resizeColumnsToContents();
 
@@ -292,7 +306,8 @@ void AutoMagik::addWorker()
 //Add New Task
 void AutoMagik::addTask()
 {
-    if (cars.empty()) {
+    if (cars.empty()) 
+    {
         QMessageBox::information(this, QLatin1String("No Cars Available"), QLatin1String("Please add a car before adding a task."));
         return;
     }
@@ -303,10 +318,23 @@ void AutoMagik::addTask()
     QVBoxLayout* mainLayout = new QVBoxLayout(&dialog);
 
     QComboBox* carSelection = new QComboBox(&dialog);
-    for (size_t i = 0; i < cars.size(); ++i) { 
+    for (size_t i = 0; i < cars.size(); ++i) 
+    { 
         const auto& car = cars[i];
         carSelection->addItem(QString::fromStdString(car.getMake() + " " + car.getModel() + " (" + std::to_string(car.getProductionYear()) + ")"),
             QVariant::fromValue(static_cast<int>(i))); //Store index in data role
+    }
+
+	QComboBox* workerComboBox = new QComboBox(&dialog);
+    if (!this->workers.empty())
+    {
+        for (const auto& worker : workers)
+        {
+            workerComboBox->addItem(QString::fromStdString(worker.getWorkerName()+", "+worker.getPosition()));
+        }
+    } else {
+		workerComboBox->addItem(QLatin1String("No Workers Available"));
+		workerComboBox->setDisabled(true); //Disabling the combobox if there are no workers
     }
 
 	//Priority combo box
@@ -325,11 +353,14 @@ void AutoMagik::addTask()
     initialCommentsInput->setPlaceholderText(QLatin1String("Enter initial comments (optional)"));
     initialCommentsInput->setMinimumHeight(60);
 
-    QFormLayout* form = new QFormLayout(); //Form layout for car selection
-    form->addRow(new QLabel(QLatin1String("Select Priority:"),&dialog));
+    QFormLayout* form = new QFormLayout(); //Form layout
+    form->addRow(new QLabel(QLatin1String("Select Priority:"),&dialog)); //Priority selection
     form->addWidget(priorityComboBox);
     
-    form->addRow(new QLabel(QLatin1String("Select Car:"), &dialog), carSelection);
+    form->addRow(new QLabel(QLatin1String("Select Car:"), &dialog), carSelection); //Car selection
+    mainLayout->addLayout(form);
+
+	form->addRow(new QLabel(QLatin1String("Select Worker:"), &dialog), workerComboBox); //Worker selection
     mainLayout->addLayout(form);
 
     mainLayout->addWidget(new QLabel(QLatin1String("Instructions:"), &dialog));
@@ -366,13 +397,23 @@ void AutoMagik::addTask()
 		newTask.setTaskPriority(selectedPriority); //Set selected priority;
 
         int selectedCarDataIndex = carSelection->currentData().toInt(); //Get stored index
-        if (selectedCarDataIndex >= 0 && selectedCarDataIndex < static_cast<int>(cars.size())) {
+        if (selectedCarDataIndex >= 0 && selectedCarDataIndex < static_cast<int>(cars.size())) 
+        {
             newTask.setTaskCar(cars[selectedCarDataIndex]); //Assign selected car by reference/copy
         }
         else {
             QMessageBox::critical(this, QLatin1String("Error"), QLatin1String("Invalid car selection index."));
             return; //Should not happen if populated correctly
         }
+		int selectedWorkerIndex = workerComboBox->currentIndex();
+        if (selectedWorkerIndex >= 0 && selectedWorkerIndex < static_cast<int>(workers.size()))
+        {
+			this->workers[selectedWorkerIndex].assignTask(newTask); //Assign task to selected worker
+			newTask.setTaskWorkerID(workers[selectedWorkerIndex].getWorkerID()); //Set worker ID in task
+        } /*else {
+            QMessageBox::critical(this, QLatin1String("Error"), QLatin1String("Invalid worker selection index."));
+            return; //Should not happen if populated correctly
+        }*/
 
         newTask.setTaskStatus(NEW); //Set default status to NEW
 
@@ -1094,18 +1135,119 @@ void AutoMagik::displayCarInfoDialog()
     carInfoDialog->open(); 
 }
 
-
-//Placeholder functions for future implementation
+//Function for adding tasks
 void AutoMagik::editSelectedTask()
 {
-    // TODO: Get selected task index from ui.tasksTableWidget->currentRow()
-    //       Check if selection is valid
-    //       Create a dialog similar to addTask, pre-filled with selected task's data
-    //       On OK, update the task object in the 'tasks' vector
-    //       Call updateManagerTables() and updateWorkerDashboard()
-    QMessageBox::information(this, QLatin1String("Not Implemented"), QLatin1String("Editing tasks is not yet implemented."));
+	int rowIndex = ui.tasksTableWidget->currentRow(); //Get selected task index
+	if (rowIndex < 0 || rowIndex >= static_cast<int>(tasks.size())) //Checking if the selection is valid
+	{
+		QMessageBox::warning(this, QLatin1String("No Task Selected"), QLatin1String("Please select a task from the list first."));
+		return;
+	}
+	//Get the selected task
+	Task& selectedTask = tasks[rowIndex];
+
+    QDialog dialog(this);
+    dialog.setWindowTitle(QLatin1String("Edit Task"));
+    dialog.setMinimumWidth(450);
+    QVBoxLayout* mainLayout = new QVBoxLayout(&dialog);
+
+    QComboBox* carSelection = new QComboBox(&dialog);
+    for (size_t i = 0; i < cars.size(); ++i)
+    {
+        const auto& car = cars[i];
+        carSelection->addItem(QString::fromStdString(car.getMake() + " " + car.getModel() + " (" + std::to_string(car.getProductionYear()) + ")"),
+            QVariant::fromValue(static_cast<int>(i))); //Store index in data role
+    }
+
+
+    //Priority combo box
+    QComboBox* priorityComboBox = new QComboBox(&dialog);
+    priorityComboBox->addItem(QLatin1String("Low"), QVariant::fromValue(LOW));
+    priorityComboBox->addItem(QLatin1String("Medium"), QVariant::fromValue(MEDIUM));
+    priorityComboBox->addItem(QLatin1String("High"), QVariant::fromValue(HIGH));
+    priorityComboBox->setCurrentText(QString::fromStdString(selectedTask.getTaskPriority())); //Set current index to task's priority
+
+    QTextEdit* instructionsInput = new QTextEdit(&dialog);
+	instructionsInput->setText(QString::fromStdString(selectedTask.getTaskInstructions()));
+    instructionsInput->setMinimumHeight(80);
+    QTextEdit* partsInput = new QTextEdit(&dialog);
+    partsInput->setPlaceholderText(QLatin1String("Enter parts needed (optional)"));
+	if (selectedTask.getPartsNeeded() != "") //Check if parts are needed
+	{
+		partsInput->setText(QString::fromStdString(selectedTask.getPartsNeeded()));
+	}
+    partsInput->setMinimumHeight(60);
+    QTextEdit* initialCommentsInput = new QTextEdit(&dialog);
+    initialCommentsInput->setPlaceholderText(QLatin1String("Enter initial comments (optional)"));
+	if (selectedTask.getComments() != "") //Check if there are any comments
+	{
+		initialCommentsInput->setText(QString::fromStdString(selectedTask.getComments()));
+	}
+    initialCommentsInput->setMinimumHeight(60);
+
+    QFormLayout* form = new QFormLayout(); //Form layout
+    form->addRow(new QLabel(QLatin1String("Select Priority:"), &dialog)); //Priority selection
+    form->addWidget(priorityComboBox);
+
+    form->addRow(new QLabel(QLatin1String("Select Car:"), &dialog), carSelection); //Car selection
+    mainLayout->addLayout(form);
+
+    mainLayout->addWidget(new QLabel(QLatin1String("Instructions:"), &dialog));
+    mainLayout->addWidget(instructionsInput);
+    mainLayout->addWidget(new QLabel(QLatin1String("Parts Needed:"), &dialog));
+    mainLayout->addWidget(partsInput);
+    mainLayout->addWidget(new QLabel(QLatin1String("Initial Comments:"), &dialog));
+    mainLayout->addWidget(initialCommentsInput);
+
+    mainLayout->addStretch();
+
+    QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, &dialog);
+    mainLayout->addWidget(&buttonBox);
+
+    connect(&buttonBox, &QDialogButtonBox::accepted, [&]() {
+        if (instructionsInput->toPlainText().trimmed().isEmpty())
+        {
+            QMessageBox::warning(&dialog, QLatin1String("Input Error"), QLatin1String("Task Instructions cannot be empty."));
+        }
+        else {
+            dialog.accept();
+        }
+        });
+    connect(&buttonBox, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
+
+    if (dialog.exec() == QDialog::Accepted) {
+        Task newTask;
+        newTask.setTaskID(static_cast<int>(tasks.size()) + 5001); //Simple temporary ID
+        newTask.setTaskInstructions(instructionsInput->toPlainText().trimmed().toStdString());
+        newTask.setPartsNeeded(partsInput->toPlainText().trimmed().toStdString());
+        newTask.setComments(initialCommentsInput->toPlainText().trimmed().toStdString());
+
+        priority selectedPriority = static_cast<priority>(priorityComboBox->currentData().toInt());
+        newTask.setTaskPriority(selectedPriority); //Set selected priority;
+
+        int selectedCarDataIndex = carSelection->currentData().toInt(); //Get stored index
+        if (selectedCarDataIndex >= 0 && selectedCarDataIndex < static_cast<int>(cars.size()))
+        {
+            newTask.setTaskCar(cars[selectedCarDataIndex]); //Assign selected car by reference/copy
+        }
+        else {
+            QMessageBox::critical(this, QLatin1String("Error"), QLatin1String("Invalid car selection index."));
+            return; //Should not happen if populated correctly
+        }
+
+        newTask.setTaskStatus(NEW); //Set default status to NEW
+
+		tasks[rowIndex] = newTask; //Update the task in the vector
+
+        updateManagerTables(); //Refresh UI
+        updateWorkerDashboard(); //Also refresh worker view
+    }
+
 }
 
+
+//Function for assigning/reassigning tasks to workers
 void AutoMagik::assignReassignTask()
 {
     // TODO: Get selected task index from ui.tasksTableWidget->currentRow()
@@ -1118,6 +1260,7 @@ void AutoMagik::assignReassignTask()
     QMessageBox::information(this, QLatin1String("Not Implemented"), QLatin1String("Assigning tasks is not yet implemented."));
 }
 
+//Function for deleting tasks
 void AutoMagik::deleteTask()
 {
     // TODO: Get selected task index from ui.tasksTableWidget->currentRow()
@@ -1129,4 +1272,30 @@ void AutoMagik::deleteTask()
     //       Handle unassigning the task if it was assigned to a worker
     //       Call updateManagerTables() and updateWorkerDashboard()
     QMessageBox::information(this, QLatin1String("Not Implemented"), QLatin1String("Deleting tasks is not yet implemented."));
+}
+
+//Function for editing cars
+void AutoMagik::editSelectedCar()
+{
+	//COFANIE LICZNIKA SAMOCHODU TU WSTAWIĘ (Rollback mileage) - OTWORZY SIĘ DRUGI DIALOG BOX Z OBECNYM PRZEBIEGIEM, GDZIE MAX VALUE 
+    //TO TEN PRZEBIEG DO COFANIA
+    //BĘDZIE TEŻ OKIENKO ARE YOU SURE? THERE IS NO GOING BACK
+}
+
+//Function for deleting cars
+void AutoMagik::deleteSelectedCar()
+{
+
+}
+
+//Function for editing workers
+void AutoMagik::editSelectedWorker()
+{
+
+}
+
+//Function for deleting workers
+void AutoMagik::deleteSelectedWorker()
+{
+
 }
