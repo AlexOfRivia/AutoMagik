@@ -36,6 +36,9 @@
 #include <QtCore5Compat/QRegExp> 
 #endif
 
+/*TODO 
+FIX THE BUG WHEN A WORKER HAS TWO TASKS ASSIGNED, AND ONE GETS DELETED,
+IT SHOW THAT THE WORKER HAS NONE ASSIGNED TASKS !!!!!*/
 
 
 AutoMagik::AutoMagik(QWidget* parent)
@@ -1263,15 +1266,59 @@ void AutoMagik::assignReassignTask()
 //Function for deleting tasks
 void AutoMagik::deleteTask()
 {
-    // TODO: Get selected task index from ui.tasksTableWidget->currentRow()
-    //       Check if selection is valid
-    //       Show a QMessageBox::question to confirm deletion
-    //       If confirmed:
     //       Find the task in the 'tasks' vector using the index or ID
     //       tasks.erase(tasks.begin() + index);
     //       Handle unassigning the task if it was assigned to a worker
     //       Call updateManagerTables() and updateWorkerDashboard()
-    QMessageBox::information(this, QLatin1String("Not Implemented"), QLatin1String("Deleting tasks is not yet implemented."));
+    int selectedTaskIndex = ui.tasksTableWidget->currentRow(); //Getting the selected row index
+    if (selectedTaskIndex < 0 || selectedTaskIndex >= static_cast<int>(tasks.size())) //Checking if the selection is valid
+    {
+        QMessageBox::warning(this, QLatin1String("No Task Selected"), QLatin1String("Please select a task from the list first."));
+        return;
+    }
+
+    QDialog* dialog = new QDialog(this); //Creating a dialog box
+    dialog->setWindowTitle(QLatin1String("Delete Task"));
+    dialog->setMinimumWidth(450);
+
+    QVBoxLayout* mainLayout = new QVBoxLayout(dialog);
+
+    QFormLayout* form = new QFormLayout(); //Form layout
+
+    form->addRow(new QLabel(QLatin1String("Are you sure you want to delete this task?")));
+    mainLayout->addLayout(form);
+    mainLayout->addStretch();
+
+    QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, dialog);
+    mainLayout->addWidget(&buttonBox);
+
+    connect(&buttonBox, &QDialogButtonBox::accepted, [&]() { dialog->accept(); });
+    connect(&buttonBox, &QDialogButtonBox::rejected, dialog, &QDialog::reject);
+
+    if (dialog->exec() == QDialog::Accepted) 
+    {
+        if (this->tasks[selectedTaskIndex].getTaskWorkerID() != 0)
+        {
+            for (auto& worker : workers)
+            {
+                if (this->tasks[selectedTaskIndex].getTaskWorkerID() == worker.getWorkerID())
+                {
+                    worker.clearTask();
+                }
+            }
+        }
+
+        //Removing the task from the task vector
+        this->tasks.erase(tasks.begin() + selectedTaskIndex);
+       
+        //Removing the row from the table
+        ui.tasksTableWidget->removeRow(selectedTaskIndex);
+
+
+
+        updateManagerTables(); //Refreshing UI
+        updateWorkerDashboard(); //Also refreshing worker view
+    }
 }
 
 //Function for editing cars
