@@ -1,4 +1,4 @@
-#include "AutoMagik.h"
+﻿#include "AutoMagik.h"
 #include "ui_AutoMagik.h"
 #include <QTextEdit>
 #include <QLabel>
@@ -49,6 +49,8 @@ AutoMagik::AutoMagik(QWidget* parent)
 
     ui.setupUi(this);
 
+    firebase.setAPIKey("AIzaSyB-IpfsuvwFD8b_fNBbOCM9eRoTKfODR9w"); //setting the API key to our data base ( we dont know how to use env vars yet so for now itll look like this )
+    
     //API key loading
     QByteArray apiKeyEnvVar = qgetenv("API_NINJAS_KEY");
     if (!apiKeyEnvVar.isEmpty()) {
@@ -71,14 +73,104 @@ AutoMagik::AutoMagik(QWidget* parent)
     QObject::connect(ui.workerModeButton, &QPushButton::clicked, [this]() { ui.stackedWidget->setCurrentIndex(1); });   //Worker Login Page
 
 
-    //Manager
     //Manager Login Page
-    QObject::connect(ui.backButton1, &QPushButton::clicked, [this]() { ui.stackedWidget->setCurrentIndex(0); });          //Back to Mode Selection
-    QObject::connect(ui.managerLoginButton, &QPushButton::clicked, [this]() { ui.stackedWidget->setCurrentIndex(4); });   //To Manager Tasks Page (need to implement login logic)
+    QObject::connect(ui.backButton1, &QPushButton::clicked, [this]() { ui.stackedWidget->setCurrentIndex(0); 
+    // Clear manager login fields
+    ui.managerLoginEmail->clear();
+    ui.managerPasswordLogin->clear();
+    // Also clear worker fields just in case
+    ui.workerLoginEmail->clear();
+    ui.workerPasswordLogin->clear();
+        });//Back to Mode Selection
+    //Showing the managerDashboardPage
+    connect(&firebase, &Firebase::loginFailed, this, [this](const QString& error) {
+        QMessageBox::warning(this, "Login Error", error);
+        });
+
+        //Update login handlers for managers
+        QObject::connect(ui.managerLoginButton, &QPushButton::clicked, [this]() {
+        QString email = ui.managerLoginEmail->toPlainText();
+        QString password = ui.managerPasswordLogin->toPlainText();
+
+        // turn off previous connections
+        QObject::disconnect(&firebase, &Firebase::managerSignedIn, nullptr, nullptr);
+        QObject::disconnect(&firebase, &Firebase::workerSignedIn, nullptr, nullptr);
+        QObject::disconnect(&firebase, &Firebase::loginFailed, nullptr, nullptr);
+
+        
+        connect(&firebase, &Firebase::managerSignedIn, this, [this]() {
+            ui.stackedWidget->setCurrentIndex(4); // Manager panel
+            });
+        connect(&firebase, &Firebase::loginFailed, this, [this](const QString& error) {
+            QMessageBox::warning(this, "Login Error", error);
+
+            });
+
+        firebase.signUserIn(email, password);
+        });
+    //Returning to the main page - manager
+    QObject::connect(
+        ui.managerBackButton, &QPushButton::clicked, [this]() {
+            ui.stackedWidget->setCurrentIndex(0);
+            // Clear manager login fields
+            ui.managerLoginEmail->clear();
+            ui.managerPasswordLogin->clear();
+            // Also clear worker fields just in case
+            ui.workerLoginEmail->clear();
+            ui.workerPasswordLogin->clear();
+        }
+    );
     QObject::connect(ui.createManagerAccButton, &QPushButton::clicked, [this]() { ui.stackedWidget->setCurrentIndex(2); }); //To Manager Register Page
     //Manager Register Page
-    QObject::connect(ui.backButton3, &QPushButton::clicked, [this]() { ui.stackedWidget->setCurrentIndex(3); });         //Back to Manager Login
-    QObject::connect(ui.registerButton, &QPushButton::clicked, [this]() { ui.stackedWidget->setCurrentIndex(4); });      //To Manager Tasks Page (need to implement register logic)
+    QObject::connect(ui.backButton3, &QPushButton::clicked, [this]() { ui.stackedWidget->setCurrentIndex(3);
+        ui.managerRegisterEmail->clear();   //clear an input
+        ui.managerRegisterPassword->clear(); //clear an input               
+    }); //Back to Manager Login
+
+    ////Adding new manager to database
+    //Registration button
+    QObject::connect(ui.registerButton, &QPushButton::clicked, [this]() {
+        QString email = ui.managerRegisterEmail->toPlainText();
+        QString password = ui.managerRegisterPassword->toPlainText();
+        // Email validation
+        QRegularExpression emailRegex(R"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)");
+        if (!emailRegex.match(email).hasMatch()) {
+            QMessageBox::warning(this, "Invalid Email", "Please enter a valid email address");
+            return;
+        }
+        //Password must have at least 6 symbols
+        if (password.length() < 6) {
+            QMessageBox::warning(this, "Weak Password", "Password must be at least 6 characters long");
+            return;
+        }
+        // Turning off all previous connections
+        QObject::disconnect(&firebase, &Firebase::managerSignedIn, nullptr, nullptr);
+        QObject::disconnect(&firebase, &Firebase::managerAccountCreated, nullptr, nullptr);
+        QObject::disconnect(&firebase, &Firebase::registrationFailed, nullptr, nullptr);
+        // Succesfull registration handler
+        connect(&firebase, &Firebase::managerAccountCreated, this, [this, email]() {
+            QMessageBox::information(this, "Success", "Account created successfully!");
+            ui.managerRegisterEmail->clear();   //clear an input
+            ui.managerRegisterPassword->clear(); //clear an input
+            // After successfull registration
+            });
+        // Rwgistration error handler
+        connect(&firebase, &Firebase::registrationFailed, this, [this](const QString& error) {
+            QMessageBox::critical(this, "Registration Error", error);
+            //staying on registration page
+            ui.managerRegisterEmail->clear();   //clear an input
+            ui.managerRegisterPassword->clear(); //clear an input
+            });
+            ui.managerRegisterEmail->setFocus();
+        // If registration was succesfull we can login in
+        connect(&firebase, &Firebase::managerSignedIn, this, [this]() {
+            ui.stackedWidget->setCurrentIndex(4); 
+            });
+        //add manager to firebase
+        firebase.addManagerAccount(email, password);
+        });
+
+
     //Manager Cars Page
     QObject::connect(ui.managerBackButton2, &QPushButton::clicked, [this]() { ui.stackedWidget->setCurrentIndex(0); }); //Sign Out -> Mode Selection
     QObject::connect(ui.tasksButton, &QPushButton::clicked, [this]() { ui.stackedWidget->setCurrentIndex(4); });       //To Tasks Page
@@ -94,15 +186,46 @@ AutoMagik::AutoMagik(QWidget* parent)
     QObject::connect(ui.carsButton2, &QPushButton::clicked, [this]() { ui.stackedWidget->setCurrentIndex(6); });
     QObject::connect(ui.tasksButton2, &QPushButton::clicked, [this]() { ui.stackedWidget->setCurrentIndex(4); });
     QObject::connect(ui.addWorkerButton, &QPushButton::clicked, this, &AutoMagik::addWorker);
-
-
-    //Worker
     //Worker Login Page
-    QObject::connect(ui.backButton2, &QPushButton::clicked, [this]() { ui.stackedWidget->setCurrentIndex(0); });         //Back to Mode Selection
-    QObject::connect(ui.workerLoginButton, &QPushButton::clicked, [this]() { ui.stackedWidget->setCurrentIndex(5); });   //To Worker Dashboard (need to implement login logic)
-    //Worker Dashboard Page
-    QObject::connect(ui.workerBackButton, &QPushButton::clicked, [this]() { ui.stackedWidget->setCurrentIndex(0); });  //Sign Out -> Mode Selection
+    QObject::connect(ui.backButton2, &QPushButton::clicked, [this]() { ui.stackedWidget->setCurrentIndex(0); 
+    // Clear manager login fields
+    ui.managerLoginEmail->clear();
+    ui.managerPasswordLogin->clear();
+    // Also clear worker fields just in case
+    ui.workerLoginEmail->clear();
+    ui.workerPasswordLogin->clear();
+        });//Back to Mode Selection 
 
+    QObject::connect(
+        ui.workerLoginButton, &QPushButton::clicked, [this]()
+        {
+            QString email = ui.workerLoginEmail->toPlainText();
+            QString password = ui.workerPasswordLogin->toPlainText();
+
+            // turn off previous connection
+            QObject::disconnect(&firebase, &Firebase::managerSignedIn, nullptr, nullptr);
+            QObject::disconnect(&firebase, &Firebase::workerSignedIn, nullptr, nullptr);
+
+            firebase.signUserIn(email, password);
+            QObject::connect(&firebase, &Firebase::workerSignedIn, [this]()
+                {
+                    ui.stackedWidget->setCurrentIndex(5);
+                }
+            );
+        }
+    );
+    //Worker Dashboard Page
+    QObject::connect(
+        ui.workerBackButton, &QPushButton::clicked, [this]() {
+            ui.stackedWidget->setCurrentIndex(0);
+            // Clear worker login fields
+            ui.workerLoginEmail->clear();
+            ui.workerPasswordLogin->clear();
+            // Also clear manager fields just in case
+            ui.managerLoginEmail->clear();
+            ui.managerPasswordLogin->clear();
+        }
+    );
 
     //Worker dashboard connections
     //When the selected item in the task list changes, update the details view
@@ -110,8 +233,6 @@ AutoMagik::AutoMagik(QWidget* parent)
         this, &AutoMagik::updateWorkerDashboardSelection);
     //Connect "Car Info" button
     QObject::connect(ui.carInfoButton, &QPushButton::clicked, this, &AutoMagik::showCarInfo);
-
-
     //Initial button states and table refresh
     updateManagerTables();
     updateWorkerDashboard(); //Initial population of worker dashboard (can be empty)
@@ -119,8 +240,6 @@ AutoMagik::AutoMagik(QWidget* parent)
     ui.markCompleteButton->setEnabled(false);
     ui.addCommentButton->setEnabled(false);
     ui.carInfoButton->setEnabled(false); //Initially, the car info button should be disabled
-
-    //NOTE: Edit and Delete buttons are handled by updateManagerTables (for enabling/disabling)
 }
 
 
@@ -286,6 +405,21 @@ void AutoMagik::addWorker()
 
         workers.push_back(newWorker);
         updateManagerTables(); //Refresh the UI
+
+        //Adding worker to database
+        if (!firebase.getIdToken().isEmpty()) {
+              firebase.addNewWorkerToDatabase(
+                QString::fromStdString(newWorker.getWorkerName()),
+                QString::fromStdString(newWorker.getPosition()),
+                newWorker.getWorkerExperience(),
+                newWorker.getWorkerSalary(),
+                newWorker.getWorkerAge(),
+                firebase.getIdToken()
+            );
+        }
+        else {
+            QMessageBox::warning(this, "Error", "Not authenticated.");
+        }
     }
 }
 
@@ -487,6 +621,20 @@ void AutoMagik::addCar()
         cars.push_back(newCar);
         updateManagerTables(); //Refresh UI
         //Also potentially update car selection dropdowns if they exist elsewhere
+        if (!firebase.getIdToken().isEmpty()) {
+            firebase.addCarToDatabase(
+                QString::fromStdString(newCar.getMake()),
+                QString::fromStdString(newCar.getModel()),
+                QString::fromStdString(newCar.getEngineType()),
+                newCar.getProductionYear(),
+                newCar.getCarMileage(),
+                newCar.getClientPhoneNumber(),
+                firebase.getIdToken()
+            );
+        }
+        else {
+            QMessageBox::warning(this, "Error", "Not authenticated");
+        }
     }
 }
 

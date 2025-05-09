@@ -4,6 +4,7 @@
 #include <vector>
 #include "ui_AutoMagik.h"
 #include "Car.h"
+#include "Firebase.h"
 #include "Task.h"
 #include "Worker.h"
 #include <QDialog>
@@ -69,4 +70,6 @@ private:
 
     void checkAndShowCombinedInfoDialog(); //Checks if requests are done, then calls display
     void displayCarInfoDialog();           //Creates and displays the actual info dialog
+
+    Firebase firebase;                     //Creates firebase class for backend functionality 
 };
