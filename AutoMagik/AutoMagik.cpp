@@ -1253,23 +1253,90 @@ void AutoMagik::editSelectedTask()
 //Function for assigning/reassigning tasks to workers
 void AutoMagik::assignReassignTask()
 {
-    // TODO: Get selected task index from ui.tasksTableWidget->currentRow()
-    //       Get selected worker index from ui.workersTableWidget->currentRow() (or use a separate selection mechanism)
-    //       Check if selections are valid
-    //       Create a confirmation dialog or a worker selection dialog
-    //       Update the Task object (e.g., task.setAssignedWorkerID(worker.getWorkerID()))
-    //       Update the Worker object (e.g., worker.assignTask(task.getTaskID()))
-    //       Call updateManagerTables() and updateWorkerDashboard()
-    QMessageBox::information(this, QLatin1String("Not Implemented"), QLatin1String("Assigning tasks is not yet implemented."));
+    int selectedTaskIndex = ui.tasksTableWidget->currentRow(); //Getting the selected row index
+    if (selectedTaskIndex < 0 || selectedTaskIndex >= static_cast<int>(tasks.size())) //Checking if the selection is valid
+    {
+        QMessageBox::warning(this, QLatin1String("No Task Selected"), QLatin1String("Please select a task from the list first."));
+        return;
+    }
+
+    int currentWorkerID = this->tasks[selectedTaskIndex].getTaskWorkerID(); //Getting the current worker ID
+
+    QDialog* dialog = new QDialog(this); //Creating a dialog box
+    dialog->setWindowTitle(QLatin1String("Assign/Reassign Task"));
+    dialog->setMinimumWidth(450);
+    QVBoxLayout* mainLayout = new QVBoxLayout(dialog);
+    QFormLayout* form = new QFormLayout(); //Form layout
+
+    QLabel* label = new QLabel(QLatin1String("Select Worker:"), dialog);
+    QComboBox* workerSelection = new QComboBox(dialog);
+    for (const auto& worker : workers)
+    {
+        workerSelection->addItem(QString::number(worker.getWorkerID()), QVariant(worker.getWorkerID())); //Adding a worker to the combo box
+    }
+
+    if (currentWorkerID != 0) //Checking if there is a worker assigned to the task
+    {
+        workerSelection->setCurrentText(QString::number(currentWorkerID)); //Setting the current combobox text to the assigned worker
+    }
+    else
+    {
+        workerSelection->setCurrentIndex(-1); //No worker assigned
+    }
+
+    form->addRow(label, workerSelection); //Adding the label and combobox to the form
+    mainLayout->addLayout(form);
+    mainLayout->addStretch();
+
+    QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, dialog);
+    mainLayout->addWidget(&buttonBox);
+
+    connect(&buttonBox, &QDialogButtonBox::accepted, [&]() { dialog->accept(); });
+    connect(&buttonBox, &QDialogButtonBox::rejected, dialog, &QDialog::reject);
+
+    if (dialog->exec() == QDialog::Accepted)
+    {
+        int selectedWorkerID = workerSelection->currentData().toInt(); //Getting the selected worker ID
+
+        if (selectedWorkerID <= 0) //Checking if the selection is valid
+        {
+            QMessageBox::warning(this, QLatin1String("No Worker Selected"), QLatin1String("Please select a worker from the list first."));
+            return;
+        }
+
+        //Clearing the task from the previous worker
+        if (currentWorkerID != 0)
+        {
+            for (auto& worker : workers)
+            {
+                if (worker.getWorkerID() == currentWorkerID)
+                {
+                    worker.clearTask(); //Clearing the task from the previous worker
+                    break;
+                }
+            }
+        }
+
+        //Assigning the task to the new worker
+        for (auto& worker : workers)
+        {
+            if (worker.getWorkerID() == selectedWorkerID)
+            {
+                worker.assignTask(this->tasks[selectedTaskIndex]); //Assign the task to the selected worker
+                this->tasks[selectedTaskIndex].setTaskWorkerID(worker.getWorkerID()); //Updating the task's worker ID
+                break;
+            }
+        }
+
+        updateManagerTables(); // Refreshing UI
+        updateWorkerDashboard(); // Also refreshing worker view
+    }
 }
+
 
 //Function for deleting tasks
 void AutoMagik::deleteTask()
 {
-    //       Find the task in the 'tasks' vector using the index or ID
-    //       tasks.erase(tasks.begin() + index);
-    //       Handle unassigning the task if it was assigned to a worker
-    //       Call updateManagerTables() and updateWorkerDashboard()
     int selectedTaskIndex = ui.tasksTableWidget->currentRow(); //Getting the selected row index
     if (selectedTaskIndex < 0 || selectedTaskIndex >= static_cast<int>(tasks.size())) //Checking if the selection is valid
     {
