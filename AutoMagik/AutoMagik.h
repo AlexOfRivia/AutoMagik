@@ -13,25 +13,60 @@
 #include <QComboBox>
 #include <QException>
 #include <QMessageBox>
+#include <QLineEdit>
+#include <QFormLayout>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QNetworkRequest>
+#include <QJsonDocument>
+#include <QJsonObject> 
+#include <QJsonArray>
+#include <QUrlQuery>
+
 
 class AutoMagik : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    AutoMagik(QWidget *parent = nullptr);
+    AutoMagik(QWidget* parent = nullptr);
     ~AutoMagik();
+
+private slots: /* slots are special member functions in Qt that can be connected to signals, when a signal is emitted,
+               any connected slots are automatically invoked, imo useful */
+
+    void addCar();
+    void addWorker();
+    void addTask();
+    void editSelectedTask();    //Placeholder
+    void assignReassignTask();  //Placeholder
+    void deleteTask();          //Placeholder
+    void updateManagerTables();
+    void updateWorkerDashboard();
+    void updateWorkerDashboardSelection();
+    void showCarInfo();         //Slot to trigger API calls
+    void handleNhtsaReplyFinished();
+    void handleApiNinjaReplyFinished();
+
 
 private:
     Ui::AutoMagikClass ui;
 
-    void addTask(); //Adding task to table
-	void addCar(); //Adding car to table
-	void editSelectedTask(); //Editing selected task
-	void assignReassignTask(); //Assigning or reassigning task
-    void deleteTask(); //Deleting tasks from table
+    QNetworkAccessManager* networkManager; //Main manager
+    QString apiKey;
+    std::vector<Car> cars;
+    std::vector<Task> tasks;
+    std::vector<Worker> workers;
+    int currentWorkerTaskIndex = -1; //Track selected task for worker
 
-	std::vector<Car> cars; //Vector of cars
-	std::vector<Task> tasks; //Vector of tasks
-    std::vector<Worker> workers; //Vector of workers
+    QJsonObject lastNhtsaResult;
+    QJsonObject lastApiNinjaResult;
+    bool nhtsaRequestPending = false;
+    bool apiNinjaRequestPending = false;
+    QString lastMakeForDialog;      //Store details for the dialog/image search
+    QString lastModelForDialog;
+    int lastYearForDialog;
+
+    void checkAndShowCombinedInfoDialog(); //Checks if requests are done, then calls display
+    void displayCarInfoDialog();           //Creates and displays the actual info dialog
 };

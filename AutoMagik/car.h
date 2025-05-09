@@ -14,9 +14,12 @@ public:
 	void setCarMileage(int mileage); //Setting the mileage of the car
 	void setClientPhoneNumber(int phoneNumber); //Setting the client phone number
 
-	std::string getMake();
-	std::string getModel();
-
+	std::string getMake() const;
+	std::string getModel() const;
+	std::string getEngineType() const;       
+	int getProductionYear() const;            
+	int getCarMileage() const;                
+	int getClientPhoneNumber() const;
 
 private:
 	std::string carMake; //Make of the car
