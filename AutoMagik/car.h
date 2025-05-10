@@ -23,6 +23,10 @@ public:
 	int getCarMileage() const;                
 	int getClientPhoneNumber() const;
 
+	//Overloading the equality operator
+	bool operator==(const Car& other) const;
+
+
 private:
 	std::string carMake; //Make of the car
 	std::string carModel; //Model of the car

@@ -79,3 +79,13 @@ int Car::getClientPhoneNumber() const
 {
     return this->clientPhoneNumber;
 }
+
+bool Car::operator==(const Car& other) const
+{
+    return carMake == other.carMake &&
+        carModel == other.carModel &&
+        engineType == other.engineType &&
+        productionYear == other.productionYear &&
+        carMileage == other.carMileage &&
+        clientPhoneNumber == other.clientPhoneNumber;
+}

@@ -1399,7 +1399,46 @@ void AutoMagik::editSelectedCar()
 //Function for deleting cars
 void AutoMagik::deleteSelectedCar()
 {
+    int selectedCarIndex = ui.carsTableWidget->currentRow(); //Getting the selected row index
+    if (selectedCarIndex < 0 || selectedCarIndex >= static_cast<int>(cars.size())) //Checking if the selection is valid
+    {
+        QMessageBox::warning(this, QLatin1String("No Car Selected"), QLatin1String("Please select a car from the list first."));
+        return;
+    }
 
+    //Checking if the car is assigned to any task
+    for (const auto& task : tasks)
+    {
+        if (task.getCarObject() == cars[selectedCarIndex])
+        {
+            QMessageBox::warning(this, QLatin1String("Car Assigned"), QLatin1String("This car is assigned to a task. Please delete the task first."));
+            return; //Exiting if the car is assigned to a task
+        }
+    }
+
+    QDialog* dialog = new QDialog(this);
+    dialog->setWindowTitle(QLatin1String("Delete Car"));
+    dialog->setMinimumWidth(450);
+    QVBoxLayout* mainLayout = new QVBoxLayout(dialog);
+    QFormLayout* form = new QFormLayout();
+    form->addRow(new QLabel(QLatin1String("Are you sure you want to delete this car?")));
+    mainLayout->addLayout(form);
+    mainLayout->addStretch();
+
+    QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, dialog);
+    mainLayout->addWidget(&buttonBox);
+
+    connect(&buttonBox, &QDialogButtonBox::accepted, dialog, &QDialog::accept);
+    connect(&buttonBox, &QDialogButtonBox::rejected, dialog, &QDialog::reject);
+
+    if (dialog->exec() == QDialog::Accepted)
+    {
+        //Delete the selected car
+        cars.erase(cars.begin() + selectedCarIndex); //Remove the car from the vector
+        ui.carsTableWidget->removeRow(selectedCarIndex); //Remove the row from the table
+
+        updateManagerTables(); // Refresh the UI
+    }
 }
 
 //Function for editing workers

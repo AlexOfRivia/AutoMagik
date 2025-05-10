@@ -44,9 +44,11 @@ private slots: /* slots are special member functions in Qt that can be connected
     void assignReassignTask();  //Placeholder
     void deleteTask();          //Placeholder
 
+    //Cars
     void editSelectedCar();
 	void deleteSelectedCar();
 
+    //Workers
     void editSelectedWorker();
 	void deleteSelectedWorker();
 

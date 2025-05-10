@@ -263,9 +263,16 @@
 				<item>
 					<widget class="QStackedWidget" name="stackedWidget">
 						<property name="currentIndex">
-							<number>6</number>
+							<number>5</number>
 						</property>
 						<widget class="QWidget" name="modeSelectionPage">
+							<property name="styleSheet">
+								<string notr="true">
+									QWidget#modeSelectionPage {
+									background-color: qradialgradient(spread:pad, cx:0.506, cy:0.500364, radius:2, fx:0.504618, fy:0.5, stop:0 rgba(0, 0, 0, 255), stop:1 rgba(95, 100, 153, 255));
+									}
+								</string>
+							</property>
 							<layout class="QVBoxLayout" name="modeSelectionLayout">
 								<property name="leftMargin">
 									<number>20</number>
@@ -280,17 +287,65 @@
 									<number>20</number>
 								</property>
 								<item>
-									<widget class="QLabel" name="titleLabel">
-										<property name="font">
-											<font>
-												<pointsize>24</pointsize>
-												<bold>true</bold>
-											</font>
-										</property>
-										<property name="text">
-											<string>Welcome to AutoMagik</string>
-										</property>
-									</widget>
+									<layout class="QHBoxLayout" name="horizontalLayout_19">
+										<item>
+											<spacer name="horizontalSpacer_24">
+												<property name="orientation">
+													<enum>Qt::Orientation::Horizontal</enum>
+												</property>
+												<property name="sizeHint" stdset="0">
+													<size>
+														<width>40</width>
+														<height>20</height>
+													</size>
+												</property>
+											</spacer>
+										</item>
+										<item>
+											<widget class="QLabel" name="titleLabel">
+												<property name="maximumSize">
+													<size>
+														<width>16777215</width>
+														<height>16777215</height>
+													</size>
+												</property>
+												<property name="font">
+													<font>
+														<family>ISOCT</family>
+														<pointsize>72</pointsize>
+														<italic>false</italic>
+														<bold>true</bold>
+													</font>
+												</property>
+												<property name="styleSheet">
+													<string notr="true">
+														QLabel#titleLabel {
+														font-size: 80px;
+														font: 72pt &quot;ISOCT&quot;;
+														font-weight: bold;
+														color: white;
+														}
+													</string>
+												</property>
+												<property name="text">
+													<string>AUTOMAGIK</string>
+												</property>
+											</widget>
+										</item>
+										<item>
+											<spacer name="horizontalSpacer_25">
+												<property name="orientation">
+													<enum>Qt::Orientation::Horizontal</enum>
+												</property>
+												<property name="sizeHint" stdset="0">
+													<size>
+														<width>40</width>
+														<height>20</height>
+													</size>
+												</property>
+											</spacer>
+										</item>
+									</layout>
 								</item>
 								<item>
 									<spacer name="verticalSpacer">
@@ -303,7 +358,7 @@
 										<property name="sizeHint" stdset="0">
 											<size>
 												<width>20</width>
-												<height>40</height>
+												<height>50</height>
 											</size>
 										</property>
 									</spacer>
@@ -327,17 +382,24 @@
 											<widget class="QPushButton" name="workerModeButton">
 												<property name="minimumSize">
 													<size>
-														<width>450</width>
-														<height>175</height>
+														<width>400</width>
+														<height>39</height>
 													</size>
 												</property>
-												<property name="text">
-													<string>Worker Mode</string>
+												<property name="styleSheet">
+													<string notr="true">
+														QPushButton#workerModeButton {
+														background-color: #0d0d0d;
+														color: rgb(255, 255, 255);
+														border-radius: 0px;
+														border: 1px solid #cccccc;
+														font-size: 30px;
+														font: 36pt &quot;ISOCP&quot;;
+														}
+													</string>
 												</property>
-												<property name="icon">
-													<iconset resource="AutoMagik.qrc">
-														<normaloff>:/icons/worker.svg</normaloff>:/icons/worker.svg
-													</iconset>
+												<property name="text">
+													<string>Worker</string>
 												</property>
 												<property name="iconSize">
 													<size>
@@ -354,7 +416,7 @@
 												</property>
 												<property name="sizeHint" stdset="0">
 													<size>
-														<width>40</width>
+														<width>30</width>
 														<height>20</height>
 													</size>
 												</property>
@@ -364,17 +426,24 @@
 											<widget class="QPushButton" name="managerModeButton">
 												<property name="minimumSize">
 													<size>
-														<width>450</width>
-														<height>175</height>
+														<width>400</width>
+														<height>39</height>
 													</size>
 												</property>
-												<property name="text">
-													<string>Manager Mode</string>
+												<property name="styleSheet">
+													<string notr="true">
+														QPushButton#managerModeButton {
+														background-color: #0d0d0d;
+														color: rgb(255, 255, 255);
+														border-radius: 00px;
+														border: 1px solid #cccccc;
+														font-size: 30px;
+														font: 36pt &quot;ISOCP&quot;;
+														}
+													</string>
 												</property>
-												<property name="icon">
-													<iconset resource="AutoMagik.qrc">
-														<normaloff>:/icons/manager.svg</normaloff>:/icons/manager.svg
-													</iconset>
+												<property name="text">
+													<string>Manager</string>
 												</property>
 												<property name="iconSize">
 													<size>
@@ -418,6 +487,13 @@
 							</layout>
 						</widget>
 						<widget class="QWidget" name="WorkerLoginPage">
+							<property name="styleSheet">
+								<string notr="true">
+									QWidget#WorkerLoginPage {
+									background-color: qradialgradient(spread:pad, cx:0.506, cy:0.500364, radius:2, fx:0.504618, fy:0.5, stop:0 rgba(0, 0, 0, 255), stop:1 rgba(95, 100, 153, 255));
+									}
+								</string>
+							</property>
 							<layout class="QVBoxLayout" name="verticalLayout_2">
 								<item>
 									<layout class="QVBoxLayout" name="verticalLayout_4">
@@ -428,8 +504,18 @@
 														<property name="minimumSize">
 															<size>
 																<width>100</width>
-																<height>50</height>
+																<height>39</height>
 															</size>
+														</property>
+														<property name="styleSheet">
+															<string notr="true">
+																QPushButton#backButton2 {
+																background-color: #0d0d0d;
+																border: 1px solid #cccccc;
+																border-radius: 20px;
+																font-size: 20px;
+																}
+															</string>
 														</property>
 														<property name="text">
 															<string>Back</string>
@@ -462,7 +548,7 @@
 												<property name="sizeHint" stdset="0">
 													<size>
 														<width>20</width>
-														<height>40</height>
+														<height>100</height>
 													</size>
 												</property>
 											</spacer>
@@ -486,11 +572,23 @@
 													<widget class="QLabel" name="label_2">
 														<property name="font">
 															<font>
-																<pointsize>28</pointsize>
+																<family>ISOCP</family>
+																<pointsize>50</pointsize>
+																<italic>false</italic>
+																<bold>true</bold>
 															</font>
 														</property>
+														<property name="styleSheet">
+															<string notr="true">
+																QLabel#label_2  {
+																font-size: 60px;
+																font: 50pt &quot;ISOCP&quot;;
+																font-weight: bold;
+																}
+															</string>
+														</property>
 														<property name="text">
-															<string>Login to Worker</string>
+															<string>SIGN IN AS WORKER</string>
 														</property>
 													</widget>
 												</item>
@@ -520,7 +618,7 @@
 												<property name="sizeHint" stdset="0">
 													<size>
 														<width>20</width>
-														<height>70</height>
+														<height>50</height>
 													</size>
 												</property>
 											</spacer>
@@ -532,7 +630,7 @@
 														<property name="maximumSize">
 															<size>
 																<width>500</width>
-																<height>45</height>
+																<height>50</height>
 															</size>
 														</property>
 														<property name="layoutDirection">
@@ -540,6 +638,17 @@
 														</property>
 														<property name="autoFillBackground">
 															<bool>false</bool>
+														</property>
+														<property name="styleSheet">
+															<string notr="true">
+																QTextEdit#workerLoginEmail {
+																color: rgb(255, 255, 255);
+																background-color: #0d0d0d;
+																border-radius: 0px;
+																border: 1px solid #cccccc;
+																font-size: 20px;
+																}
+															</string>
 														</property>
 														<property name="placeholderText">
 															<string>Email address</string>
@@ -559,7 +668,7 @@
 												<property name="sizeHint" stdset="0">
 													<size>
 														<width>20</width>
-														<height>40</height>
+														<height>0</height>
 													</size>
 												</property>
 											</spacer>
@@ -571,8 +680,19 @@
 														<property name="maximumSize">
 															<size>
 																<width>500</width>
-																<height>45</height>
+																<height>50</height>
 															</size>
+														</property>
+														<property name="styleSheet">
+															<string notr="true">
+																QTextEdit#workerPasswordLogin {
+																color: rgb(255, 255, 255);
+																background-color: #0d0d0d;
+																border-radius: 0px;
+																border: 1px solid #cccccc;
+																font-size: 20px;
+																}
+															</string>
 														</property>
 														<property name="placeholderText">
 															<string>Password</string>
@@ -585,16 +705,31 @@
 											<layout class="QHBoxLayout" name="horizontalLayout_14">
 												<item>
 													<widget class="QPushButton" name="forgotPasswordButton1">
+														<property name="minimumSize">
+															<size>
+																<width>0</width>
+																<height>19</height>
+															</size>
+														</property>
 														<property name="maximumSize">
 															<size>
 																<width>150</width>
-																<height>16777215</height>
+																<height>30</height>
 															</size>
 														</property>
 														<property name="font">
 															<font>
-																<pointsize>10</pointsize>
+																<pointsize>-1</pointsize>
+																<underline>true</underline>
 															</font>
+														</property>
+														<property name="styleSheet">
+															<string notr="true">
+																QPushButton#forgotPasswordButton1 {
+																background-color: transparent;
+																font-size: 14px;
+																}
+															</string>
 														</property>
 														<property name="text">
 															<string>Forgot Password?</string>
@@ -617,7 +752,7 @@
 												<property name="sizeHint" stdset="0">
 													<size>
 														<width>20</width>
-														<height>180</height>
+														<height>100</height>
 													</size>
 												</property>
 											</spacer>
@@ -642,11 +777,21 @@
 														<property name="minimumSize">
 															<size>
 																<width>150</width>
-																<height>50</height>
+																<height>39</height>
 															</size>
 														</property>
+														<property name="styleSheet">
+															<string notr="true">
+																QPushButton#workerLoginButton {
+																background-color: #0d0d0d;
+																border: 1px solid #cccccc;
+																border-radius: 20px;
+																font-size: 20px;
+																}
+															</string>
+														</property>
 														<property name="text">
-															<string>Login</string>
+															<string>Sign in</string>
 														</property>
 													</widget>
 												</item>
@@ -670,6 +815,13 @@
 							</layout>
 						</widget>
 						<widget class="QWidget" name="registerManagerPage">
+							<property name="styleSheet">
+								<string notr="true">
+									QWidget#registerManagerPage {
+									background-color: qradialgradient(spread:pad, cx:0.506, cy:0.500364, radius:2, fx:0.504618, fy:0.5, stop:0 rgba(0, 0, 0, 255), stop:1 rgba(95, 100, 153, 255));
+									}
+								</string>
+							</property>
 							<layout class="QVBoxLayout" name="verticalLayout_5">
 								<item>
 									<layout class="QVBoxLayout" name="verticalLayout_6">
@@ -680,8 +832,18 @@
 														<property name="minimumSize">
 															<size>
 																<width>100</width>
-																<height>50</height>
+																<height>39</height>
 															</size>
+														</property>
+														<property name="styleSheet">
+															<string notr="true">
+																QPushButton#backButton3 {
+																background-color: #0d0d0d;
+																border: 1px solid #cccccc;
+																border-radius: 20px;
+																font-size: 20px;
+																}
+															</string>
 														</property>
 														<property name="text">
 															<string>Back</string>
@@ -714,7 +876,7 @@
 												<property name="sizeHint" stdset="0">
 													<size>
 														<width>20</width>
-														<height>40</height>
+														<height>100</height>
 													</size>
 												</property>
 											</spacer>
@@ -738,11 +900,23 @@
 													<widget class="QLabel" name="label_3">
 														<property name="font">
 															<font>
-																<pointsize>28</pointsize>
+																<family>ISOCP</family>
+																<pointsize>50</pointsize>
+																<italic>false</italic>
+																<bold>true</bold>
 															</font>
 														</property>
+														<property name="styleSheet">
+															<string notr="true">
+																QLabel#label_3  {
+																font-size: 60px;
+																font: 50pt &quot;ISOCP&quot;;
+																font-weight: bold;
+																}
+															</string>
+														</property>
 														<property name="text">
-															<string>Create Manager Account</string>
+															<string>CREATE MANAGER ACCOUNT</string>
 														</property>
 													</widget>
 												</item>
@@ -772,7 +946,7 @@
 												<property name="sizeHint" stdset="0">
 													<size>
 														<width>20</width>
-														<height>70</height>
+														<height>50</height>
 													</size>
 												</property>
 											</spacer>
@@ -784,7 +958,7 @@
 														<property name="maximumSize">
 															<size>
 																<width>500</width>
-																<height>45</height>
+																<height>50</height>
 															</size>
 														</property>
 														<property name="layoutDirection">
@@ -792,6 +966,17 @@
 														</property>
 														<property name="autoFillBackground">
 															<bool>false</bool>
+														</property>
+														<property name="styleSheet">
+															<string notr="true">
+																QTextEdit#managerRegisterEmail {
+																color: rgb(255, 255, 255);
+																background-color: #0d0d0d;
+																border-radius: 0px;
+																border: 1px solid #cccccc;
+																font-size: 20px;
+																}
+															</string>
 														</property>
 														<property name="placeholderText">
 															<string>Email address</string>
@@ -811,7 +996,7 @@
 												<property name="sizeHint" stdset="0">
 													<size>
 														<width>20</width>
-														<height>40</height>
+														<height>0</height>
 													</size>
 												</property>
 											</spacer>
@@ -823,8 +1008,19 @@
 														<property name="maximumSize">
 															<size>
 																<width>500</width>
-																<height>45</height>
+																<height>50</height>
 															</size>
+														</property>
+														<property name="styleSheet">
+															<string notr="true">
+																QTextEdit#managerRegisterPassword {
+																color: rgb(255, 255, 255);
+																background-color: #0d0d0d;
+																border-radius: 0px;
+																border: 1px solid #cccccc;
+																font-size: 20px;
+																}
+															</string>
 														</property>
 														<property name="placeholderText">
 															<string>Password</string>
@@ -844,7 +1040,7 @@
 												<property name="sizeHint" stdset="0">
 													<size>
 														<width>20</width>
-														<height>180</height>
+														<height>100</height>
 													</size>
 												</property>
 											</spacer>
@@ -869,8 +1065,18 @@
 														<property name="minimumSize">
 															<size>
 																<width>150</width>
-																<height>50</height>
+																<height>39</height>
 															</size>
+														</property>
+														<property name="styleSheet">
+															<string notr="true">
+																QPushButton#registerButton {
+																background-color: #0d0d0d;
+																border: 1px solid #cccccc;
+																border-radius: 20px;
+																font-size: 20px;
+																}
+															</string>
 														</property>
 														<property name="text">
 															<string>Register</string>
@@ -897,6 +1103,13 @@
 							</layout>
 						</widget>
 						<widget class="QWidget" name="ManagerLoginPage">
+							<property name="styleSheet">
+								<string notr="true">
+									QWidget#ManagerLoginPage {
+									background-color: qradialgradient(spread:pad, cx:0.506, cy:0.500364, radius:2, fx:0.504618, fy:0.5, stop:0 rgba(0, 0, 0, 255), stop:1 rgba(95, 100, 153, 255));
+									}
+								</string>
+							</property>
 							<layout class="QVBoxLayout" name="verticalLayout_3">
 								<item>
 									<layout class="QVBoxLayout" name="verticalLayout">
@@ -907,8 +1120,18 @@
 														<property name="minimumSize">
 															<size>
 																<width>100</width>
-																<height>50</height>
+																<height>39</height>
 															</size>
+														</property>
+														<property name="styleSheet">
+															<string notr="true">
+																QPushButton#backButton1 {
+																background-color: #0d0d0d;
+																border: 1px solid #cccccc;
+																border-radius: 20px;
+																font-size: 20px;
+																}
+															</string>
 														</property>
 														<property name="text">
 															<string>Back</string>
@@ -941,7 +1164,7 @@
 												<property name="sizeHint" stdset="0">
 													<size>
 														<width>20</width>
-														<height>40</height>
+														<height>100</height>
 													</size>
 												</property>
 											</spacer>
@@ -965,11 +1188,23 @@
 													<widget class="QLabel" name="label">
 														<property name="font">
 															<font>
-																<pointsize>28</pointsize>
+																<family>ISOCP</family>
+																<pointsize>50</pointsize>
+																<italic>false</italic>
+																<bold>true</bold>
 															</font>
 														</property>
+														<property name="styleSheet">
+															<string notr="true">
+																QLabel#label  {
+																font-size: 60px;
+																font: 50pt &quot;ISOCP&quot;;
+																font-weight: bold;
+																}
+															</string>
+														</property>
 														<property name="text">
-															<string>Login To Manager</string>
+															<string>SIGN IN AS MANAGER</string>
 														</property>
 													</widget>
 												</item>
@@ -999,7 +1234,7 @@
 												<property name="sizeHint" stdset="0">
 													<size>
 														<width>20</width>
-														<height>40</height>
+														<height>50</height>
 													</size>
 												</property>
 											</spacer>
@@ -1011,7 +1246,7 @@
 														<property name="maximumSize">
 															<size>
 																<width>500</width>
-																<height>45</height>
+																<height>50</height>
 															</size>
 														</property>
 														<property name="layoutDirection">
@@ -1021,7 +1256,15 @@
 															<bool>false</bool>
 														</property>
 														<property name="styleSheet">
-															<string notr="true"/>
+															<string notr="true">
+																QTextEdit#managerLoginEmail {
+																color: rgb(255, 255, 255);
+																background-color: #0d0d0d;
+																border-radius: 0px;
+																border: 1px solid #cccccc;
+																font-size: 20px;
+																}
+															</string>
 														</property>
 														<property name="placeholderText">
 															<string>Email address</string>
@@ -1041,7 +1284,7 @@
 												<property name="sizeHint" stdset="0">
 													<size>
 														<width>20</width>
-														<height>40</height>
+														<height>0</height>
 													</size>
 												</property>
 											</spacer>
@@ -1056,6 +1299,17 @@
 																<height>45</height>
 															</size>
 														</property>
+														<property name="styleSheet">
+															<string notr="true">
+																QTextEdit#managerPasswordLogin {
+																color: rgb(255, 255, 255);
+																background-color: #0d0d0d;
+																border-radius: 0px;
+																border: 1px solid #cccccc;
+																font-size: 20px;
+																}
+															</string>
+														</property>
 														<property name="placeholderText">
 															<string>Password</string>
 														</property>
@@ -1067,6 +1321,12 @@
 											<layout class="QHBoxLayout" name="horizontalLayout_13">
 												<item>
 													<widget class="QPushButton" name="forgotPasswordButton2">
+														<property name="minimumSize">
+															<size>
+																<width>0</width>
+																<height>19</height>
+															</size>
+														</property>
 														<property name="maximumSize">
 															<size>
 																<width>150</width>
@@ -1075,14 +1335,20 @@
 														</property>
 														<property name="font">
 															<font>
-																<pointsize>10</pointsize>
+																<pointsize>-1</pointsize>
+																<underline>true</underline>
 															</font>
 														</property>
 														<property name="layoutDirection">
 															<enum>Qt::LayoutDirection::LeftToRight</enum>
 														</property>
 														<property name="styleSheet">
-															<string notr="true"/>
+															<string notr="true">
+																QPushButton#forgotPasswordButton2 {
+																background-color: transparent;
+																font-size: 14px;
+																}
+															</string>
 														</property>
 														<property name="text">
 															<string>Forgot Password?</string>
@@ -1105,7 +1371,7 @@
 												<property name="sizeHint" stdset="0">
 													<size>
 														<width>20</width>
-														<height>150</height>
+														<height>100</height>
 													</size>
 												</property>
 											</spacer>
@@ -1130,11 +1396,28 @@
 												</item>
 												<item>
 													<widget class="QPushButton" name="createManagerAccButton">
+														<property name="minimumSize">
+															<size>
+																<width>200</width>
+																<height>21</height>
+															</size>
+														</property>
 														<property name="maximumSize">
 															<size>
 																<width>150</width>
 																<height>16777215</height>
 															</size>
+														</property>
+														<property name="styleSheet">
+															<string notr="true">
+																QPushButton#createManagerAccButton {
+																background-color: #0d0d0d;
+																border: 1px solid #cccccc;
+																border-radius: 20px;
+																font-size: 20px;
+																color: white;
+																}
+															</string>
 														</property>
 														<property name="text">
 															<string>Create Account</string>
@@ -1170,7 +1453,7 @@
 												<property name="sizeHint" stdset="0">
 													<size>
 														<width>20</width>
-														<height>20</height>
+														<height>0</height>
 													</size>
 												</property>
 											</spacer>
@@ -1197,23 +1480,33 @@
 													<widget class="QPushButton" name="managerLoginButton">
 														<property name="minimumSize">
 															<size>
-																<width>150</width>
-																<height>50</height>
+																<width>200</width>
+																<height>39</height>
 															</size>
 														</property>
 														<property name="maximumSize">
 															<size>
-																<width>250</width>
+																<width>0</width>
 																<height>16777215</height>
 															</size>
 														</property>
 														<property name="font">
 															<font>
-																<pointsize>12</pointsize>
+																<pointsize>-1</pointsize>
 															</font>
 														</property>
+														<property name="styleSheet">
+															<string notr="true">
+																QPushButton#managerLoginButton {
+																background-color: #0d0d0d;
+																border: 1px solid #cccccc;
+																border-radius: 20px;
+																font-size: 20px;
+																}
+															</string>
+														</property>
 														<property name="text">
-															<string>Login</string>
+															<string>Sign in</string>
 														</property>
 													</widget>
 												</item>
@@ -1240,6 +1533,13 @@
 							</layout>
 						</widget>
 						<widget class="QWidget" name="managerTasksPage">
+							<property name="styleSheet">
+								<string notr="true">
+									QWidget#managerTasksPage {
+									background-color: rgb(0, 0, 0);
+									}
+								</string>
+							</property>
 							<layout class="QVBoxLayout" name="managerVLayout">
 								<property name="leftMargin">
 									<number>12</number>
@@ -1257,9 +1557,19 @@
 									<widget class="QLabel" name="managerTitleLabel">
 										<property name="font">
 											<font>
-												<pointsize>18</pointsize>
+												<family>ISOCP</family>
+												<pointsize>20</pointsize>
+												<italic>false</italic>
 												<bold>true</bold>
 											</font>
+										</property>
+										<property name="styleSheet">
+											<string notr="true">
+												QLabel#managerTitleLabel {
+												font: 20pt &quot;ISOCP&quot;;
+												font-weight: bold;
+												}
+											</string>
 										</property>
 										<property name="text">
 											<string>Manager Dashboard - Tasks</string>
@@ -1273,6 +1583,14 @@
 												<horstretch>0</horstretch>
 												<verstretch>1</verstretch>
 											</sizepolicy>
+										</property>
+										<property name="styleSheet">
+											<string notr="true">
+												QTableWidget#tasksTableWidget {
+												background-color: #2B2D42;
+												border-radius: 20px;
+												}
+											</string>
 										</property>
 										<property name="editTriggers">
 											<set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
@@ -1302,40 +1620,147 @@
 											<property name="text">
 												<string>Task ID</string>
 											</property>
+											<property name="font">
+												<font>
+													<pointsize>10</pointsize>
+													<bold>true</bold>
+												</font>
+											</property>
+											<property name="background">
+												<color>
+													<red>110</red>
+													<green>120</green>
+													<blue>136</blue>
+												</color>
+											</property>
 										</column>
 										<column>
 											<property name="text">
 												<string>Car</string>
+											</property>
+											<property name="font">
+												<font>
+													<pointsize>10</pointsize>
+													<bold>true</bold>
+												</font>
+											</property>
+											<property name="background">
+												<color>
+													<red>110</red>
+													<green>120</green>
+													<blue>136</blue>
+												</color>
 											</property>
 										</column>
 										<column>
 											<property name="text">
 												<string>Description</string>
 											</property>
+											<property name="font">
+												<font>
+													<pointsize>10</pointsize>
+													<bold>true</bold>
+												</font>
+											</property>
+											<property name="background">
+												<color>
+													<red>110</red>
+													<green>120</green>
+													<blue>136</blue>
+												</color>
+											</property>
 										</column>
 										<column>
 											<property name="text">
 												<string>Status</string>
+											</property>
+											<property name="font">
+												<font>
+													<pointsize>10</pointsize>
+													<bold>true</bold>
+												</font>
+											</property>
+											<property name="background">
+												<color>
+													<red>110</red>
+													<green>120</green>
+													<blue>136</blue>
+												</color>
 											</property>
 										</column>
 										<column>
 											<property name="text">
 												<string>Worker</string>
 											</property>
+											<property name="font">
+												<font>
+													<pointsize>10</pointsize>
+													<bold>true</bold>
+												</font>
+											</property>
+											<property name="background">
+												<color>
+													<red>110</red>
+													<green>120</green>
+													<blue>136</blue>
+												</color>
+											</property>
 										</column>
 										<column>
 											<property name="text">
 												<string>Priority</string>
+											</property>
+											<property name="font">
+												<font>
+													<pointsize>10</pointsize>
+													<bold>true</bold>
+												</font>
+											</property>
+											<property name="background">
+												<color>
+													<red>110</red>
+													<green>120</green>
+													<blue>136</blue>
+												</color>
+											</property>
+											<property name="foreground">
+												<brush brushstyle="NoBrush">
+													<color alpha="255">
+														<red>110</red>
+														<green>120</green>
+														<blue>136</blue>
+													</color>
+												</brush>
 											</property>
 										</column>
 									</widget>
 								</item>
 								<item>
 									<layout class="QHBoxLayout" name="managerActionsLayout">
+										<property name="spacing">
+											<number>10</number>
+										</property>
 										<item>
 											<widget class="QPushButton" name="addTaskButton">
 												<property name="enabled">
 													<bool>false</bool>
+												</property>
+												<property name="minimumSize">
+													<size>
+														<width>130</width>
+														<height>39</height>
+													</size>
+												</property>
+												<property name="styleSheet">
+													<string notr="true">
+														QPushButton#addTaskButton {
+														background-color: #0d0d0d;
+														border: 1px solid #cccccc;
+														border-radius: 12px;
+														font-size: 14px;
+														color: rgb(255, 255, 255);
+														}
+													</string>
 												</property>
 												<property name="text">
 													<string>Add New Task</string>
@@ -1352,6 +1777,23 @@
 												<property name="enabled">
 													<bool>false</bool>
 												</property>
+												<property name="minimumSize">
+													<size>
+														<width>130</width>
+														<height>39</height>
+													</size>
+												</property>
+												<property name="styleSheet">
+													<string notr="true">
+														QPushButton#editTaskButton {
+														background-color: #0d0d0d;
+														border: 1px solid #cccccc;
+														border-radius: 12px;
+														font-size: 14px;
+														color: rgb(255, 255, 255);
+														}
+													</string>
+												</property>
 												<property name="text">
 													<string>Edit Selected</string>
 												</property>
@@ -1366,6 +1808,23 @@
 											<widget class="QPushButton" name="assignTaskButton">
 												<property name="enabled">
 													<bool>false</bool>
+												</property>
+												<property name="minimumSize">
+													<size>
+														<width>140</width>
+														<height>39</height>
+													</size>
+												</property>
+												<property name="styleSheet">
+													<string notr="true">
+														QPushButton#assignTaskButton {
+														background-color: #0d0d0d;
+														border: 1px solid #cccccc;
+														border-radius: 12px;
+														font-size: 14px;
+														color: rgb(255, 255, 255);
+														}
+													</string>
 												</property>
 												<property name="text">
 													<string>Assign/Reassign</string>
@@ -1392,6 +1851,23 @@
 										</item>
 										<item>
 											<widget class="QPushButton" name="carsButton">
+												<property name="minimumSize">
+													<size>
+														<width>120</width>
+														<height>39</height>
+													</size>
+												</property>
+												<property name="styleSheet">
+													<string notr="true">
+														QPushButton#carsButton {
+														background-color: #0d0d0d;
+														border: 1px solid #cccccc;
+														border-radius: 12px;
+														font-size: 14px;
+														color: rgb(255, 255, 255);
+														}
+													</string>
+												</property>
 												<property name="text">
 													<string>Cars</string>
 												</property>
@@ -1404,6 +1880,23 @@
 										</item>
 										<item>
 											<widget class="QPushButton" name="workersButton">
+												<property name="minimumSize">
+													<size>
+														<width>120</width>
+														<height>39</height>
+													</size>
+												</property>
+												<property name="styleSheet">
+													<string notr="true">
+														QPushButton#workersButton {
+														background-color: #0d0d0d;
+														border: 1px solid #cccccc;
+														border-radius: 12px;
+														font-size: 14px;
+														color: rgb(255, 255, 255);
+														}
+													</string>
+												</property>
 												<property name="text">
 													<string>Workers</string>
 												</property>
@@ -1432,6 +1925,23 @@
 												<property name="enabled">
 													<bool>false</bool>
 												</property>
+												<property name="minimumSize">
+													<size>
+														<width>140</width>
+														<height>39</height>
+													</size>
+												</property>
+												<property name="styleSheet">
+													<string notr="true">
+														QPushButton#deleteTaskButton {
+														background-color: #0d0d0d;
+														border: 1px solid #cccccc;
+														border-radius: 12px;
+														font-size: 14px;
+														color: rgb(255, 255, 255);
+														}
+													</string>
+												</property>
 												<property name="text">
 													<string>Delete Selected</string>
 												</property>
@@ -1444,6 +1954,23 @@
 										</item>
 										<item>
 											<widget class="QPushButton" name="managerBackButton">
+												<property name="minimumSize">
+													<size>
+														<width>120</width>
+														<height>39</height>
+													</size>
+												</property>
+												<property name="styleSheet">
+													<string notr="true">
+														QPushButton#managerBackButton {
+														background-color: #0d0d0d;
+														border: 1px solid #cccccc;
+														border-radius: 12px;
+														font-size: 14px;
+														color: rgb(255, 255, 255);
+														}
+													</string>
+												</property>
 												<property name="text">
 													<string>Sign Out</string>
 												</property>
@@ -1459,6 +1986,13 @@
 							</layout>
 						</widget>
 						<widget class="QWidget" name="workerDashboardPage">
+							<property name="styleSheet">
+								<string notr="true">
+									QWidget#workerDashboardPage {
+									background-color: rgb(0, 0, 0);
+									}
+								</string>
+							</property>
 							<layout class="QHBoxLayout" name="workerMainLayout">
 								<property name="leftMargin">
 									<number>12</number>
@@ -1479,7 +2013,15 @@
 												<property name="font">
 													<font>
 														<pointsize>14</pointsize>
+														<bold>true</bold>
 													</font>
+												</property>
+												<property name="styleSheet">
+													<string notr="true">
+														QLabel#workerTasksTitle {
+														font-weight: bold;
+														}
+													</string>
 												</property>
 												<property name="text">
 													<string>Your Assigned Tasks</string>
@@ -1494,10 +2036,25 @@
 														<verstretch>1</verstretch>
 													</sizepolicy>
 												</property>
+												<property name="styleSheet">
+													<string notr="true">
+														QListWidget#workerTaskListWidget {
+														background-color: #2B2D42;
+														border-radius: 20px;
+														}
+													</string>
+												</property>
 											</widget>
 										</item>
 										<item>
 											<widget class="QPushButton" name="workerBackButton">
+												<property name="styleSheet">
+													<string notr="true">
+														QPushButton#workerBackButton {
+														border-radius: 16px;
+														}
+													</string>
+												</property>
 												<property name="text">
 													<string>Sign Out</string>
 												</property>
@@ -1505,6 +2062,9 @@
 													<iconset resource="AutoMagik.qrc">
 														<normaloff>:/icons/back.svg</normaloff>:/icons/back.svg
 													</iconset>
+												</property>
+												<property name="autoRepeat">
+													<bool>false</bool>
 												</property>
 											</widget>
 										</item>
@@ -1536,6 +2096,14 @@
 														<height>100</height>
 													</size>
 												</property>
+												<property name="styleSheet">
+													<string notr="true">
+														QGroupBox#carInfoGroupBox {
+														border-radius: 16px;
+														background-color: #EDF2F4;
+														}
+													</string>
+												</property>
 												<property name="title">
 													<string>Car Info</string>
 												</property>
@@ -1549,6 +2117,14 @@
 														<height>100</height>
 													</size>
 												</property>
+												<property name="styleSheet">
+													<string notr="true">
+														QGroupBox#taskInfoGroupBox {
+														border-radius: 16px;
+														background-color: #EDF2F4;
+														}
+													</string>
+												</property>
 												<property name="title">
 													<string>Task Info</string>
 												</property>
@@ -1560,6 +2136,16 @@
 													<widget class="QPushButton" name="carInfoButton">
 														<property name="enabled">
 															<bool>false</bool>
+														</property>
+														<property name="styleSheet">
+															<string notr="true">
+																QPushButton#carInfoButton {
+																border: 1px solid #A00000;
+																background-color: #A00000;
+																border-radius: 16px;
+																color: white;
+																}
+															</string>
 														</property>
 														<property name="text">
 															<string>Model Information</string>
@@ -1588,22 +2174,58 @@
 										</item>
 										<item>
 											<widget class="QGroupBox" name="commentsGroupBox">
+												<property name="styleSheet">
+													<string notr="true">
+														QGroupBox#commentsGroupBox {
+														border-radius: 10px;
+														background-color: rgb(141, 153, 174);
+														}
+													</string>
+												</property>
 												<property name="title">
 													<string>Comments / Log</string>
 												</property>
 												<layout class="QVBoxLayout" name="commentsLayout">
 													<item>
-														<widget class="QTextEdit" name="commentsTextEdit"/>
+														<widget class="QTextEdit" name="commentsTextEdit">
+															<property name="styleSheet">
+																<string notr="true">
+																	QTextEdit#commentsTextEdit {
+																	border-radius: 16px;
+																	background-color: #EDF2F4;
+																	}
+																</string>
+															</property>
+														</widget>
 													</item>
 													<item>
 														<layout class="QHBoxLayout" name="newCommentLayout">
 															<item>
-																<widget class="QLineEdit" name="newCommentLineEdit"/>
+																<widget class="QLineEdit" name="newCommentLineEdit">
+																	<property name="styleSheet">
+																		<string notr="true">
+																			QLineEdit#newCommentLineEdit {
+																			border-radius: 10px;
+																			background-color: #EDF2F4;
+																			}
+																		</string>
+																	</property>
+																</widget>
 															</item>
 															<item>
 																<widget class="QPushButton" name="addCommentButton">
 																	<property name="enabled">
 																		<bool>false</bool>
+																	</property>
+																	<property name="styleSheet">
+																		<string notr="true">
+																			QPushButton#addCommentButton {
+																			border-radius: 10px;
+																			background-color: rgb(43, 45, 66);
+																			color: white;
+																			font-weight: bold;
+																			}
+																		</string>
 																	</property>
 																	<property name="text">
 																		<string>Add</string>
@@ -1641,8 +2263,18 @@
 												<property name="minimumSize">
 													<size>
 														<width>0</width>
-														<height>50</height>
+														<height>39</height>
 													</size>
+												</property>
+												<property name="styleSheet">
+													<string notr="true">
+														QPushButton#markCompleteButton {
+														background-color: #A00000;
+														border-radius: 16px;
+														border: 1px solid #A00000;
+														color: white;
+														}
+													</string>
 												</property>
 												<property name="text">
 													<string>Mark Task as Completed</string>
@@ -1659,14 +2291,31 @@
 							</layout>
 						</widget>
 						<widget class="QWidget" name="managerCarsPage">
+							<property name="styleSheet">
+								<string notr="true">
+									QWidget#managerCarsPage {
+									background-color: rgb(0, 0, 0);
+									}
+								</string>
+							</property>
 							<layout class="QVBoxLayout" name="verticalLayout_7">
 								<item>
 									<widget class="QLabel" name="managerCarLabel">
 										<property name="font">
 											<font>
-												<pointsize>18</pointsize>
+												<family>ISOCP</family>
+												<pointsize>20</pointsize>
+												<italic>false</italic>
 												<bold>true</bold>
 											</font>
+										</property>
+										<property name="styleSheet">
+											<string notr="true">
+												QLabel#managerCarLabel {
+												font: 20pt &quot;ISOCP&quot;;
+												font-weight: bold;
+												}
+											</string>
 										</property>
 										<property name="text">
 											<string>Manager Dashboard - Cars</string>
@@ -1680,6 +2329,14 @@
 												<horstretch>0</horstretch>
 												<verstretch>1</verstretch>
 											</sizepolicy>
+										</property>
+										<property name="styleSheet">
+											<string notr="true">
+												QTableWidget#carsTableWidget {
+												background-color: #2B2D42;
+												border-radius: 20px;
+												}
+											</string>
 										</property>
 										<property name="editTriggers">
 											<set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
@@ -1709,30 +2366,108 @@
 											<property name="text">
 												<string>Car Make</string>
 											</property>
+											<property name="font">
+												<font>
+													<pointsize>10</pointsize>
+													<bold>true</bold>
+												</font>
+											</property>
+											<property name="background">
+												<color>
+													<red>141</red>
+													<green>153</green>
+													<blue>174</blue>
+												</color>
+											</property>
 										</column>
 										<column>
 											<property name="text">
 												<string>Car Model</string>
+											</property>
+											<property name="font">
+												<font>
+													<pointsize>10</pointsize>
+													<bold>true</bold>
+												</font>
+											</property>
+											<property name="background">
+												<color>
+													<red>141</red>
+													<green>153</green>
+													<blue>174</blue>
+												</color>
 											</property>
 										</column>
 										<column>
 											<property name="text">
 												<string>Engine Type</string>
 											</property>
+											<property name="font">
+												<font>
+													<pointsize>10</pointsize>
+													<bold>true</bold>
+												</font>
+											</property>
+											<property name="background">
+												<color>
+													<red>141</red>
+													<green>153</green>
+													<blue>174</blue>
+												</color>
+											</property>
 										</column>
 										<column>
 											<property name="text">
 												<string>Year</string>
+											</property>
+											<property name="font">
+												<font>
+													<pointsize>10</pointsize>
+													<bold>true</bold>
+												</font>
+											</property>
+											<property name="background">
+												<color>
+													<red>141</red>
+													<green>153</green>
+													<blue>174</blue>
+												</color>
 											</property>
 										</column>
 										<column>
 											<property name="text">
 												<string>Mileage</string>
 											</property>
+											<property name="font">
+												<font>
+													<pointsize>10</pointsize>
+													<bold>true</bold>
+												</font>
+											</property>
+											<property name="background">
+												<color>
+													<red>141</red>
+													<green>153</green>
+													<blue>174</blue>
+												</color>
+											</property>
 										</column>
 										<column>
 											<property name="text">
 												<string>Owner Contact</string>
+											</property>
+											<property name="font">
+												<font>
+													<pointsize>10</pointsize>
+													<bold>true</bold>
+												</font>
+											</property>
+											<property name="background">
+												<color>
+													<red>141</red>
+													<green>153</green>
+													<blue>174</blue>
+												</color>
 											</property>
 										</column>
 									</widget>
@@ -1741,6 +2476,23 @@
 									<layout class="QHBoxLayout" name="managerActionsLayout_3">
 										<item>
 											<widget class="QPushButton" name="addCarButton">
+												<property name="minimumSize">
+													<size>
+														<width>120</width>
+														<height>39</height>
+													</size>
+												</property>
+												<property name="styleSheet">
+													<string notr="true">
+														QPushButton#addCarButton {
+														background-color: #0d0d0d;
+														border: 1px solid #cccccc;
+														border-radius: 12px;
+														font-size: 14px;
+														color: rgb(255, 255, 255);
+														}
+													</string>
+												</property>
 												<property name="text">
 													<string>Add New Car</string>
 												</property>
@@ -1755,6 +2507,23 @@
 											<widget class="QPushButton" name="editCarButton">
 												<property name="enabled">
 													<bool>false</bool>
+												</property>
+												<property name="minimumSize">
+													<size>
+														<width>120</width>
+														<height>39</height>
+													</size>
+												</property>
+												<property name="styleSheet">
+													<string notr="true">
+														QPushButton#editCarButton {
+														background-color:#0d0d0d;
+														border: 1px solid #cccccc;
+														border-radius: 12px;
+														font-size: 14px;
+														color: rgb(255, 255, 255);
+														}
+													</string>
 												</property>
 												<property name="text">
 													<string>Edit Selected</string>
@@ -1781,6 +2550,23 @@
 										</item>
 										<item>
 											<widget class="QPushButton" name="tasksButton">
+												<property name="minimumSize">
+													<size>
+														<width>120</width>
+														<height>39</height>
+													</size>
+												</property>
+												<property name="styleSheet">
+													<string notr="true">
+														QPushButton#tasksButton {
+														background-color: #0d0d0d;
+														border: 1px solid #cccccc;
+														border-radius: 12px;
+														font-size: 14px;
+														color: rgb(255, 255, 255);
+														}
+													</string>
+												</property>
 												<property name="text">
 													<string>Tasks</string>
 												</property>
@@ -1791,6 +2577,23 @@
 										</item>
 										<item>
 											<widget class="QPushButton" name="workersButton2">
+												<property name="minimumSize">
+													<size>
+														<width>120</width>
+														<height>39</height>
+													</size>
+												</property>
+												<property name="styleSheet">
+													<string notr="true">
+														QPushButton#workersButton2 {
+														background-color: #0d0d0d;
+														border: 1px solid #cccccc;
+														border-radius: 12px;
+														font-size: 14px;
+														color: rgb(255, 255, 255);
+														}
+													</string>
+												</property>
 												<property name="text">
 													<string>Workers</string>
 												</property>
@@ -1819,6 +2622,23 @@
 												<property name="enabled">
 													<bool>false</bool>
 												</property>
+												<property name="minimumSize">
+													<size>
+														<width>120</width>
+														<height>39</height>
+													</size>
+												</property>
+												<property name="styleSheet">
+													<string notr="true">
+														QPushButton#deleteCarButton {
+														background-color: #0d0d0d;
+														border: 1px solid #cccccc;
+														border-radius: 12px;
+														font-size: 14px;
+														color: rgb(255, 255, 255);
+														}
+													</string>
+												</property>
 												<property name="text">
 													<string>Delete Selected</string>
 												</property>
@@ -1831,6 +2651,23 @@
 										</item>
 										<item>
 											<widget class="QPushButton" name="managerBackButton2">
+												<property name="minimumSize">
+													<size>
+														<width>120</width>
+														<height>39</height>
+													</size>
+												</property>
+												<property name="styleSheet">
+													<string notr="true">
+														QPushButton#managerBackButton2 {
+														background-color: #0d0d0d;
+														border: 1px solid #cccccc;
+														border-radius: 12px;
+														font-size: 14px;
+														color: rgb(255, 255, 255);
+														}
+													</string>
+												</property>
 												<property name="text">
 													<string>Sign Out</string>
 												</property>
@@ -1846,14 +2683,31 @@
 							</layout>
 						</widget>
 						<widget class="QWidget" name="managerWorkersPage">
+							<property name="styleSheet">
+								<string notr="true">
+									QWidget#managerWorkersPage {
+									background-color: rgb(0, 0, 0);
+									}
+								</string>
+							</property>
 							<layout class="QVBoxLayout" name="verticalLayout_8">
 								<item>
 									<widget class="QLabel" name="managerTitleLabel_2">
 										<property name="font">
 											<font>
-												<pointsize>18</pointsize>
+												<family>ISOCP</family>
+												<pointsize>20</pointsize>
+												<italic>false</italic>
 												<bold>true</bold>
 											</font>
+										</property>
+										<property name="styleSheet">
+											<string notr="true">
+												QLabel#managerTitleLabel_2 {
+												font: 20pt &quot;ISOCP&quot;;
+												font-weight: bold;
+												}
+											</string>
 										</property>
 										<property name="text">
 											<string>Manager Dashboard - Workers</string>
@@ -1867,6 +2721,14 @@
 												<horstretch>0</horstretch>
 												<verstretch>1</verstretch>
 											</sizepolicy>
+										</property>
+										<property name="styleSheet">
+											<string notr="true">
+												QTableWidget#workersTableWidget {
+												background-color:#2B2D42;
+												border-radius: 20px;
+												}
+											</string>
 										</property>
 										<property name="editTriggers">
 											<set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
@@ -1896,35 +2758,126 @@
 											<property name="text">
 												<string>Worker ID</string>
 											</property>
+											<property name="font">
+												<font>
+													<pointsize>10</pointsize>
+													<bold>true</bold>
+												</font>
+											</property>
+											<property name="background">
+												<color>
+													<red>141</red>
+													<green>153</green>
+													<blue>174</blue>
+												</color>
+											</property>
 										</column>
 										<column>
 											<property name="text">
 												<string>Name</string>
+											</property>
+											<property name="font">
+												<font>
+													<pointsize>10</pointsize>
+													<bold>true</bold>
+												</font>
+											</property>
+											<property name="background">
+												<color>
+													<red>141</red>
+													<green>153</green>
+													<blue>174</blue>
+												</color>
 											</property>
 										</column>
 										<column>
 											<property name="text">
 												<string>Position</string>
 											</property>
+											<property name="font">
+												<font>
+													<pointsize>10</pointsize>
+													<bold>true</bold>
+												</font>
+											</property>
+											<property name="background">
+												<color>
+													<red>141</red>
+													<green>153</green>
+													<blue>174</blue>
+												</color>
+											</property>
 										</column>
 										<column>
 											<property name="text">
 												<string>Experience</string>
+											</property>
+											<property name="font">
+												<font>
+													<pointsize>10</pointsize>
+													<bold>true</bold>
+												</font>
+											</property>
+											<property name="background">
+												<color>
+													<red>141</red>
+													<green>153</green>
+													<blue>174</blue>
+												</color>
 											</property>
 										</column>
 										<column>
 											<property name="text">
 												<string>Salary</string>
 											</property>
+											<property name="font">
+												<font>
+													<pointsize>10</pointsize>
+													<bold>true</bold>
+												</font>
+											</property>
+											<property name="background">
+												<color>
+													<red>141</red>
+													<green>153</green>
+													<blue>174</blue>
+												</color>
+											</property>
 										</column>
 										<column>
 											<property name="text">
 												<string>Age</string>
 											</property>
+											<property name="font">
+												<font>
+													<pointsize>10</pointsize>
+													<bold>true</bold>
+												</font>
+											</property>
+											<property name="background">
+												<color>
+													<red>141</red>
+													<green>153</green>
+													<blue>174</blue>
+												</color>
+											</property>
 										</column>
 										<column>
 											<property name="text">
 												<string>Assigned Task</string>
+											</property>
+											<property name="font">
+												<font>
+													<pointsize>10</pointsize>
+													<bold>true</bold>
+												</font>
+											</property>
+											<property name="background">
+												<color>
+													<red>141</red>
+													<green>153</green>
+													<blue>174</blue>
+												</color>
 											</property>
 										</column>
 									</widget>
@@ -1935,6 +2888,23 @@
 											<widget class="QPushButton" name="addWorkerButton">
 												<property name="enabled">
 													<bool>true</bool>
+												</property>
+												<property name="minimumSize">
+													<size>
+														<width>120</width>
+														<height>39</height>
+													</size>
+												</property>
+												<property name="styleSheet">
+													<string notr="true">
+														QPushButton#addWorkerButton {
+														background-color: #0d0d0d;
+														border: 1px solid #cccccc;
+														border-radius: 12px;
+														font-size: 14px;
+														color: rgb(255, 255, 255);
+														}
+													</string>
 												</property>
 												<property name="text">
 													<string>Add New Worker</string>
@@ -1950,6 +2920,23 @@
 											<widget class="QPushButton" name="editWorkerButton">
 												<property name="enabled">
 													<bool>false</bool>
+												</property>
+												<property name="minimumSize">
+													<size>
+														<width>120</width>
+														<height>39</height>
+													</size>
+												</property>
+												<property name="styleSheet">
+													<string notr="true">
+														QPushButton#editWorkerButton {
+														background-color: #0d0d0d;
+														border: 1px solid #cccccc;
+														border-radius: 12px;
+														font-size: 14px;
+														color: rgb(255, 255, 255);
+														}
+													</string>
 												</property>
 												<property name="text">
 													<string>Edit Selected</string>
@@ -1976,6 +2963,23 @@
 										</item>
 										<item>
 											<widget class="QPushButton" name="carsButton2">
+												<property name="minimumSize">
+													<size>
+														<width>120</width>
+														<height>39</height>
+													</size>
+												</property>
+												<property name="styleSheet">
+													<string notr="true">
+														QPushButton#carsButton2 {
+														background-color: #0d0d0d;
+														border: 1px solid #cccccc;
+														border-radius:12px;
+														font-size: 14px;
+														color: rgb(255, 255, 255);
+														}
+													</string>
+												</property>
 												<property name="text">
 													<string>Cars</string>
 												</property>
@@ -1988,6 +2992,23 @@
 										</item>
 										<item>
 											<widget class="QPushButton" name="tasksButton2">
+												<property name="minimumSize">
+													<size>
+														<width>120</width>
+														<height>39</height>
+													</size>
+												</property>
+												<property name="styleSheet">
+													<string notr="true">
+														QPushButton#tasksButton2 {
+														background-color: #0d0d0d;
+														border: 1px solid #cccccc;
+														border-radius: 12px;
+														font-size: 14px;
+														color: rgb(255, 255, 255);
+														}
+													</string>
+												</property>
 												<property name="text">
 													<string>Tasks</string>
 												</property>
@@ -2014,6 +3035,23 @@
 												<property name="enabled">
 													<bool>false</bool>
 												</property>
+												<property name="minimumSize">
+													<size>
+														<width>120</width>
+														<height>39</height>
+													</size>
+												</property>
+												<property name="styleSheet">
+													<string notr="true">
+														QPushButton#deleteWorkerButton {
+														background-color: #0d0d0d;
+														border: 1px solid #cccccc;
+														border-radius: 12px;
+														font-size: 14px;
+														color: rgb(255, 255, 255);
+														}
+													</string>
+												</property>
 												<property name="text">
 													<string>Delete Selected</string>
 												</property>
@@ -2026,6 +3064,23 @@
 										</item>
 										<item>
 											<widget class="QPushButton" name="managerBackButton3">
+												<property name="minimumSize">
+													<size>
+														<width>120</width>
+														<height>39</height>
+													</size>
+												</property>
+												<property name="styleSheet">
+													<string notr="true">
+														QPushButton#managerBackButton3 {
+														background-color: #0d0d0d;
+														border: 1px solid #cccccc;
+														border-radius: 12px;
+														font-size: 14px;
+														color: rgb(255, 255, 255);
+														}
+													</string>
+												</property>
 												<property name="text">
 													<string>Sign Out</string>
 												</property>
