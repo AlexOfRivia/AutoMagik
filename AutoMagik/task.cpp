@@ -4,7 +4,7 @@
 //Constructor
 Task::Task()
 {
-
+	this->workerID = 0; //Default worker ID
 }
 
 //Destructor
@@ -43,6 +43,23 @@ void Task::setTaskCar(Car car)
 	this->taskCar = car;
 }
 
+void Task::setTaskWorkerID(int id)
+{
+	this->workerID = id;
+}
+
+//Setting the status of the task
+void Task::setTaskStatus(status stat)
+{
+	this->taskStatus = stat;
+}
+
+//Setting the priority of the task
+void Task::setTaskPriority(priority prio)
+{
+	this->taskPriority = prio;
+}
+
 //Getting the instructions for the task
 std::string Task::getTaskInstructions() const
 {
@@ -67,6 +84,11 @@ int Task::getTaskID() const
 	return this->taskID;
 }
 
+int Task::getTaskWorkerID() const
+{
+	return this->workerID;
+}
+
 //Getting the car for the task
 std::string Task::getTaskCar() const
 {
@@ -77,4 +99,29 @@ std::string Task::getTaskCar() const
 const Car& Task::getCarObject() const
 {
 	return this->taskCar;
+}
+
+//Getting the status of the task
+std::string Task::getTaskStatus() const
+{
+	switch (this->taskStatus) 
+	{
+	case NEW: return "New";
+	case IN_PROGRESS: return "In Progress";
+	case COMPLETED: return "Completed";
+	case CANCELLED: return "Cancelled";
+	default: return "Unknown";
+	}
+}
+
+//Getting the priority of the task
+std::string Task::getTaskPriority() const
+{
+	switch (this->taskPriority)
+	{
+	case LOW: return "Low";
+	case MEDIUM: return "Medium";
+	case HIGH: return "High";
+	default: return "Unknown";
+	}
 }
