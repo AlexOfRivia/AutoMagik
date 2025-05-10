@@ -1391,10 +1391,115 @@ void AutoMagik::deleteTask()
 //Function for editing cars
 void AutoMagik::editSelectedCar()
 {
-	//COFANIE LICZNIKA SAMOCHODU TU WSTAWIĘ (Rollback mileage) - OTWORZY SIĘ DRUGI DIALOG BOX Z OBECNYM PRZEBIEGIEM, GDZIE MAX VALUE 
-    //TO TEN PRZEBIEG DO COFANIA
-    //BĘDZIE TEŻ OKIENKO ARE YOU SURE? THERE IS NO GOING BACK
+    int selectedCarIndex = ui.carsTableWidget->currentRow(); //Getting the selected row index
+    if (selectedCarIndex < 0 || selectedCarIndex >= static_cast<int>(cars.size())) {
+        QMessageBox::warning(this, QLatin1String("No Car Selected"), QLatin1String("Please select a car from the list first."));
+        return;
+    }
+
+	QDialog dialog(this); //Oppening a dialog box
+    dialog.setWindowTitle(QLatin1String("Edit Car"));
+    QVBoxLayout* mainLayout = new QVBoxLayout(&dialog);
+
+    //Inputs:
+    QLineEdit* makeInput = new QLineEdit(&dialog);
+    makeInput->setText(QString::fromStdString(cars[selectedCarIndex].getMake()));
+    QLineEdit* modelInput = new QLineEdit(&dialog);
+    modelInput->setText(QString::fromStdString(cars[selectedCarIndex].getModel()));
+    QLineEdit* engineInput = new QLineEdit(&dialog);
+    engineInput->setText(QString::fromStdString(cars[selectedCarIndex].getEngineType()));
+    QComboBox* yearInput = new QComboBox(&dialog);
+    int currentYear = QDate::currentDate().year();
+    for (int i = currentYear; i >= 1900; i--) {
+        yearInput->addItem(QString::number(i));
+    }
+    yearInput->setCurrentText(QString::number(cars[selectedCarIndex].getProductionYear()));
+    QLineEdit* phoneNumberInput = new QLineEdit(&dialog);
+    phoneNumberInput->setText(QString::number(cars[selectedCarIndex].getClientPhoneNumber()));
+
+    //Phone number validation
+    QRegularExpression phoneRegex(QStringLiteral("^\\+?[\\d\\s]+$"));
+    phoneNumberInput->setValidator(new QRegularExpressionValidator(phoneRegex, phoneNumberInput));
+
+    QFormLayout* formLayout = new QFormLayout(); //Creating a form layout
+    //Adding everything to the form input
+    formLayout->addRow(QLatin1String("Make:"), makeInput);
+    formLayout->addRow(QLatin1String("Model:"), modelInput);
+    formLayout->addRow(QLatin1String("Year:"), yearInput);
+    formLayout->addRow(QLatin1String("Engine:"), engineInput);
+    formLayout->addRow(QLatin1String("Owner Phone:"), phoneNumberInput);
+
+    //Rolling back mileage
+    QPushButton* reverseMileageButton = new QPushButton(QLatin1String("Rollback Mileage"), &dialog);
+    connect(reverseMileageButton, &QPushButton::clicked, this, [this, selectedCarIndex]() {
+
+        QDialog mileageDialog(this);
+        mileageDialog.setWindowTitle(QLatin1String("Rollback Mileage"));
+        QVBoxLayout mileageLayout(&mileageDialog);
+
+        //Mileage spinbox
+        QSpinBox* mileageInput = new QSpinBox(&mileageDialog);
+        int currentMileage = cars[selectedCarIndex].getCarMileage();
+        mileageInput->setRange(0, currentMileage);
+        mileageInput->setValue(currentMileage);
+        mileageInput->setSingleStep(10000);
+        mileageLayout.addWidget(mileageInput);
+
+        QDialogButtonBox mileageButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, &mileageDialog);
+        mileageLayout.addWidget(&mileageButtonBox);
+
+        connect(&mileageButtonBox, &QDialogButtonBox::accepted, [&]() {
+            int newMileage = mileageInput->value();
+            cars[selectedCarIndex].setCarMileage(newMileage);
+            updateManagerTables();
+            mileageDialog.accept();
+            });
+        connect(&mileageButtonBox, &QDialogButtonBox::rejected, &mileageDialog, &QDialog::reject);
+
+        mileageDialog.exec();
+        });
+
+    formLayout->addRow(reverseMileageButton);
+    mainLayout->addLayout(formLayout);
+
+    QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, &dialog);
+    mainLayout->addWidget(&buttonBox);
+
+    connect(&buttonBox, &QDialogButtonBox::accepted, [&]() {
+        QString phoneText = phoneNumberInput->text().trimmed();
+        QString makeText = makeInput->text().trimmed();
+        QString modelText = modelInput->text().trimmed();
+
+        if (makeText.isEmpty() || modelText.isEmpty()) {
+            QMessageBox::warning(&dialog, QLatin1String("Input Error"), QLatin1String("Car Make and Model cannot be empty."));
+            return;
+        }
+
+        QString phoneCleaned = phoneText;
+        phoneCleaned.remove(' ').remove('+');
+        bool isNumeric;
+        qlonglong phoneLong = phoneCleaned.toLongLong(&isNumeric);
+
+        if (!isNumeric || phoneCleaned.isEmpty()) {
+            QMessageBox::warning(&dialog, QLatin1String("Input Error"), QLatin1String("Invalid phone number."));
+            return;
+        }
+
+        //Setting the inputs to the car object
+        cars[selectedCarIndex].setCarMake(makeInput->text().trimmed().toStdString());
+        cars[selectedCarIndex].setCarModel(modelInput->text().trimmed().toStdString());
+        cars[selectedCarIndex].setEngineType(engineInput->text().trimmed().toStdString());
+        cars[selectedCarIndex].setProductionYear(yearInput->currentText().toInt());
+        cars[selectedCarIndex].setClientPhoneNumber(static_cast<int>(phoneLong));
+
+        updateManagerTables();
+        dialog.accept();
+        });
+    connect(&buttonBox, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
+
+    dialog.exec();
 }
+
 
 //Function for deleting cars
 void AutoMagik::deleteSelectedCar()
