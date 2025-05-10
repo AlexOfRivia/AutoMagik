@@ -1542,18 +1542,102 @@ void AutoMagik::deleteSelectedCar()
         cars.erase(cars.begin() + selectedCarIndex); //Remove the car from the vector
         ui.carsTableWidget->removeRow(selectedCarIndex); //Remove the row from the table
 
-        updateManagerTables(); // Refresh the UI
+        updateManagerTables(); //Refresh the UI
     }
 }
 
 //Function for editing workers
 void AutoMagik::editSelectedWorker()
 {
+	int selectedWorkerIndex = ui.workersTableWidget->currentRow(); //Getting the selected row index
+    QDialog dialog(this);
+    dialog.setWindowTitle(QLatin1String("Edit Worker"));
+    dialog.setMinimumWidth(400);
 
+    QFormLayout* formLayout = new QFormLayout(&dialog);
+
+    QLineEdit* nameInput = new QLineEdit(&dialog);
+	nameInput->setText(QString::fromStdString(workers[selectedWorkerIndex].getWorkerName()));
+    QLineEdit* positionInput = new QLineEdit(&dialog);
+	positionInput->setText(QString::fromStdString(workers[selectedWorkerIndex].getPosition()));
+    QSpinBox* experienceInput = new QSpinBox(&dialog);
+    experienceInput->setSuffix(QLatin1String(" years"));
+    experienceInput->setRange(0, 60);
+	experienceInput->setValue(workers[selectedWorkerIndex].getWorkerExperience());
+    QSpinBox* salaryInput = new QSpinBox(&dialog);
+    salaryInput->setPrefix(QLatin1String("$ "));
+    salaryInput->setRange(0, 500000);
+    salaryInput->setSingleStep(1000);
+	salaryInput->setValue(workers[selectedWorkerIndex].getWorkerSalary());
+    QSpinBox* ageInput = new QSpinBox(&dialog);
+    ageInput->setRange(18, 100);
+	ageInput->setValue(workers[selectedWorkerIndex].getWorkerAge());
+
+    formLayout->addRow(new QLabel(QLatin1String("Worker Name:"), &dialog), nameInput);
+    formLayout->addRow(new QLabel(QLatin1String("Position:"), &dialog), positionInput);
+    formLayout->addRow(new QLabel(QLatin1String("Experience:"), &dialog), experienceInput);
+    formLayout->addRow(new QLabel(QLatin1String("Salary:"), &dialog), salaryInput);
+    formLayout->addRow(new QLabel(QLatin1String("Age:"), &dialog), ageInput);
+
+    QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, &dialog);
+    formLayout->addRow(&buttonBox);
+
+    connect(&buttonBox, &QDialogButtonBox::accepted, [&]() {
+        if (nameInput->text().trimmed().isEmpty() || positionInput->text().trimmed().isEmpty()) {
+            QMessageBox::warning(&dialog, QLatin1String("Input Error"), QLatin1String("Worker Name and Position cannot be empty."));
+            //Keep dialog open
+        }
+        else {
+            dialog.accept(); //Close dialog
+        }
+        });
+    connect(&buttonBox, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
+
+    if (dialog.exec() == QDialog::Accepted) 
+    {
+        workers[selectedWorkerIndex].setWorkerName(nameInput->text().trimmed().toStdString());
+        workers[selectedWorkerIndex].setPosition(positionInput->text().trimmed().toStdString());
+        workers[selectedWorkerIndex].setWorkerExperience(experienceInput->value());
+        workers[selectedWorkerIndex].setWorkerSalary(salaryInput->value());
+        workers[selectedWorkerIndex].setWorkerAge(ageInput->value());
+        
+        updateManagerTables(); //Refresh the UI
+    }
 }
 
 //Function for deleting workers
 void AutoMagik::deleteSelectedWorker()
 {
+	int selectedWorkerIndex = ui.workersTableWidget->currentRow(); //Getting the selected row index
+    if (selectedWorkerIndex < 0 || selectedWorkerIndex >= static_cast<int>(workers.size())) //Checking if the selection is valid
+    {
+        QMessageBox::warning(this, QLatin1String("No Car Selected"), QLatin1String("Please select a worker from the list first."));
+        return;
+    }
 
+	QDialog* dialog = new QDialog(this);
+	dialog->setWindowTitle(QLatin1String("Delete Worker"));
+	dialog->setMinimumWidth(450);
+	QVBoxLayout* mainLayout = new QVBoxLayout(dialog);
+	QFormLayout* form = new QFormLayout();
+
+    form->addRow(new QLabel(QLatin1String("Are you sure you want to delete this worker?")));
+
+	mainLayout->addLayout(form);
+    mainLayout->addStretch();
+
+    QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, dialog);
+    mainLayout->addWidget(&buttonBox);
+
+    connect(&buttonBox, &QDialogButtonBox::accepted, dialog, &QDialog::accept);
+    connect(&buttonBox, &QDialogButtonBox::rejected, dialog, &QDialog::reject);
+
+    if (dialog->exec() == QDialog::Accepted)
+    {
+        //Delete the selected worker
+        workers.erase(workers.begin() + selectedWorkerIndex); //Remove the worker from the vector
+        ui.workersTableWidget->removeRow(selectedWorkerIndex); //Remove the row from the table
+
+        updateManagerTables(); //Refresh the UI
+    }
 }
