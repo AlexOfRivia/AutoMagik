@@ -8,6 +8,7 @@ public:
 	~Car(); //Destructor
 
 	//Setters
+	void setCarId(std::string id); //set the id of the car
 	void setCarMake(std::string make); //Setting the make of the car
 	void setCarModel(std::string model); //Setting the model of the car
 	void setEngineType(std::string engine); //Setting the engine type of the car
@@ -16,11 +17,12 @@ public:
 	void setClientPhoneNumber(int phoneNumber); //Setting the client phone number
 
 	//Getters
+	std::string getCarId() const;
 	std::string getMake() const;
 	std::string getModel() const;
-	std::string getEngineType() const;       
-	int getProductionYear() const;            
-	int getCarMileage() const;                
+	std::string getEngineType() const;
+	int getProductionYear() const;
+	int getCarMileage() const;
 	int getClientPhoneNumber() const;
 
 	//Overloading the equality operator
@@ -28,6 +30,7 @@ public:
 
 
 private:
+	std::string carId; //unique id of the car
 	std::string carMake; //Make of the car
 	std::string carModel; //Model of the car
 	std::string engineType; //Type of engine
