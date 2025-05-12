@@ -80,6 +80,8 @@ int Car::getClientPhoneNumber() const
     return this->clientPhoneNumber;
 }
 
+
+
 bool Car::operator==(const Car& other) const
 {
     return carMake == other.carMake &&

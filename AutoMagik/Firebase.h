@@ -17,6 +17,7 @@ public:
     void signUserIn(const QString& emailAddress, const QString& password);  // Sign in user with email and password
     QString m_uid;
     void addManagerAccount(const QString& email, const QString& password); //Create account for manager
+    void addWorkerAccount(const QString& email, const QVariantMap& workerData, const QString& password = "123456"); //Create account for worker, think later on how to implement the default value coz this doesnt work :(
     void addCarToDatabase(const QString& make, const QString& model, const QString& engineType, int year, int mileage, int phoneNumber, const QString& idToken); //adding car to firebase
     void addNewWorkerToDatabase(const QString& workerName, const QString& position, const int experience, const int salary, const int age, const QString& idToken);//adding new worker to firebase
     QString getIdToken() const { return m_idToken; } // for getting token from firebase
@@ -24,6 +25,7 @@ signals:
     void workerSignedIn(const QString& workerName);  // Signal emitted when the workers sign in successfully
     void managerSignedIn(const QString& managerName); //Signal emittes when the managers sign in successfully
     void managerAccountCreated();  //Signal emitted when manager account was created successfully
+    void workerAccountCreated(); //same but for worker account
     void loginFailed(const QString& errorMessage);  //signal emittes when the was an error during login
     void registrationFailed(const QString& errorMessage); //signal emittes when the was an error during registration
 public slots:

@@ -93,6 +93,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Car.cpp" />
+    <ClCompile Include="Firebase.cpp" />
     <ClCompile Include="Task.cpp" />
     <ClCompile Include="Worker.cpp" />
     <QtRcc Include="AutoMagik.qrc" />
@@ -103,6 +104,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Car.h" />
+    <QtMoc Include="Firebase.h" />
     <ClInclude Include="Task.h" />
     <ClInclude Include="Worker.h" />
   </ItemGroup>

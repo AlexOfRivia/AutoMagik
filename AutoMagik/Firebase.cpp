@@ -66,7 +66,7 @@ void Firebase::addManagerAccount(const QString& email, const QString& password) 
 
     QNetworkReply* reply = m_networkAccessManager->post(request, QJsonDocument::fromVariant(payload).toJson());
 
-    connect(reply, &QNetworkReply::finished, [this, reply, email]() {
+    connect(reply, &QNetworkReply::finished, [this, reply, email, password]() {
         QByteArray response = reply->readAll();
         reply->deleteLater();
 
@@ -85,6 +85,7 @@ void Firebase::addManagerAccount(const QString& email, const QString& password) 
 
         QVariantMap managerData;
         managerData["email"] = email;
+        managerData["password"] = password; //updated to include password in our db
         managerData["role"] = "manager";
 
         QNetworkRequest dbRequest((QUrl(dbUrl)));
@@ -100,11 +101,68 @@ void Firebase::addManagerAccount(const QString& email, const QString& password) 
                 emit registrationFailed("Failed to save manager data");
             }
             else {
-                emit managerAccountCreated();
+                emit managerAccountCreated(); 
             }
             });
         });
 }
+
+
+void Firebase::addWorkerAccount(const QString& email, const QVariantMap& workerData, const QString& password) {
+    QString signUpEndpoint = "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=" + m_apiKey;
+
+    QVariantMap payload;
+    payload["email"] = email;
+    payload["password"] = password;
+    payload["returnSecureToken"] = true;
+
+    QNetworkRequest request((QUrl(signUpEndpoint)));
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+
+    QNetworkReply* reply = m_networkAccessManager->post(request, QJsonDocument::fromVariant(payload).toJson());
+
+    connect(reply, &QNetworkReply::finished, [this, reply, email, password, workerData]() {
+        QByteArray response = reply->readAll();
+        reply->deleteLater();
+
+        QJsonDocument json = QJsonDocument::fromJson(response);
+
+        if (json.object().contains("error")) {
+            QString errorMsg = json.object().value("error").toObject().value("message").toString();
+            emit registrationFailed(errorMsg);
+            return;
+        }
+
+        QString uid = json.object().value("localId").toString();
+        QString idToken = json.object().value("idToken").toString();
+
+        QString dbUrl = "https://automagik-96e43-default-rtdb.europe-west1.firebasedatabase.app/automagik/workers/" + uid + ".json?auth=" + idToken;
+
+        QVariantMap localWorkerData = workerData;
+        localWorkerData["email"] = email;
+        localWorkerData["password"] = password;
+        localWorkerData["role"] = "worker";
+
+        QNetworkRequest dbRequest((QUrl(dbUrl)));
+        dbRequest.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+
+        QNetworkReply* dbReply = m_networkAccessManager->put(dbRequest, QJsonDocument::fromVariant(localWorkerData).toJson());
+
+        connect(dbReply, &QNetworkReply::finished, [this, dbReply]() {
+            QByteArray dbResponse = dbReply->readAll();
+            dbReply->deleteLater();
+
+            if (QJsonDocument::fromJson(dbResponse).object().contains("error")) {
+                emit registrationFailed("Failed to save worker data");
+            }
+            else {
+                emit workerAccountCreated(); //might be useful for smth
+            }
+            });
+        });
+}
+
+
 
 // Helper function to send a POST request with JSON data
 void Firebase::performPOST(const QString& url, const QJsonDocument& payload)
@@ -287,3 +345,6 @@ void Firebase::performAuthenticatedDatabaseCall()
     // Send GET request to database
     m_networkReply = m_networkAccessManager->get(QNetworkRequest(QUrl(endPoint)));
 }
+
+
+

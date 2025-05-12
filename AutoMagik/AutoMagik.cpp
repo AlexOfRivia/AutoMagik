@@ -164,6 +164,7 @@ AutoMagik::AutoMagik(QWidget* parent)
         // If registration was succesfull we can login in
         connect(&firebase, &Firebase::managerSignedIn, this, [this]() {
             ui.stackedWidget->setCurrentIndex(4);
+
             });
         //add manager to firebase
         firebase.addManagerAccount(email, password);
@@ -171,6 +172,11 @@ AutoMagik::AutoMagik(QWidget* parent)
 
 
 
+    //fetches data for our manager:
+    connect(&firebase, &Firebase::managerSignedIn, this, [this]() 
+        {
+            // TODO: gets data from the firebase and puts it in our dashboard once we log in
+        });
 
 
     //Manager Cars Page
@@ -416,20 +422,34 @@ void AutoMagik::addWorker()
     salaryInput->setSingleStep(1000);
     QSpinBox* ageInput = new QSpinBox(&dialog);
     ageInput->setRange(18, 100);
+    QLineEdit* emailInput = new QLineEdit(&dialog);
+    QLineEdit* passwordInput = new QLineEdit(&dialog);
 
     formLayout->addRow(new QLabel(QLatin1String("Worker Name:"), &dialog), nameInput);
     formLayout->addRow(new QLabel(QLatin1String("Position:"), &dialog), positionInput);
     formLayout->addRow(new QLabel(QLatin1String("Experience:"), &dialog), experienceInput);
     formLayout->addRow(new QLabel(QLatin1String("Salary:"), &dialog), salaryInput);
     formLayout->addRow(new QLabel(QLatin1String("Age:"), &dialog), ageInput);
+    formLayout->addRow(new QLabel(QLatin1String("Email:"), &dialog), emailInput);
+    formLayout->addRow(new QLabel(QLatin1String("Password:"), &dialog), passwordInput);
 
     QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, &dialog);
     formLayout->addRow(&buttonBox);
 
-    connect(&buttonBox, &QDialogButtonBox::accepted, [&]() {
-        if (nameInput->text().trimmed().isEmpty() || positionInput->text().trimmed().isEmpty()) {
-            QMessageBox::warning(&dialog, QLatin1String("Input Error"), QLatin1String("Worker Name and Position cannot be empty."));
+    
+
+    connect(&buttonBox, &QDialogButtonBox::accepted, [&]() 
+        {
+            //regex for email auth
+        QRegularExpression emailRegex(R"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)");
+        QRegularExpressionMatch match = emailRegex.match(emailInput->text().trimmed());
+
+        if (nameInput->text().trimmed().isEmpty() || positionInput->text().trimmed().isEmpty() || passwordInput->text().trimmed().isEmpty()) {
+            QMessageBox::warning(&dialog, QLatin1String("Input Error"), QLatin1String("Worker Name, Position and Password cannot be empty."));
             //Keep dialog open
+        }
+        else if (!match.hasMatch()) {
+            QMessageBox::warning(&dialog, QLatin1String("Input Error"), QLatin1String("Email form is incorrect."));
         }
         else {
             dialog.accept(); //Close dialog
@@ -437,7 +457,8 @@ void AutoMagik::addWorker()
         });
     connect(&buttonBox, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
 
-    if (dialog.exec() == QDialog::Accepted) {
+    if (dialog.exec() == QDialog::Accepted) 
+    {
         Worker newWorker;
         //Simple sequential ID - implement UUIDs or database IDs later
         newWorker.setWorkerID(static_cast<int>(workers.size()) + 1001);
@@ -452,22 +473,17 @@ void AutoMagik::addWorker()
         updateManagerTables(); //Refresh the UI
 
         //Adding worker to database
-        if (!firebase.getIdToken().isEmpty()) {
-            firebase.addNewWorkerToDatabase(
-                QString::fromStdString(newWorker.getWorkerName()),
-                QString::fromStdString(newWorker.getPosition()),
-                newWorker.getWorkerExperience(),
-                newWorker.getWorkerSalary(),
-                newWorker.getWorkerAge(),
-                firebase.getIdToken()
-            );
-        }
-        else {
-            QMessageBox::warning(this, "Error", "Not authenticated.");
-        }
+            QVariantMap data;
+            data["w_id"] = QVariant(newWorker.getWorkerID()); 
+            data["name"] = QVariant(QString::fromStdString(newWorker.getWorkerName()));
+            data["position"] = QVariant(QString::fromStdString(newWorker.getPosition()));
+            data["experience"] = QVariant(newWorker.getWorkerExperience());
+            data["salary"] = QVariant(newWorker.getWorkerSalary());
+            data["age"] = QVariant(newWorker.getWorkerAge());
+            data["manager"] = QVariant(firebase.m_uid);  
+            //delete [] newWorker - THIS WILL ONLY BE NEEDED ONCE WE START DOWNLOAD FROM THE DB
+            firebase.addWorkerAccount(emailInput->text().trimmed(), data ,passwordInput->text().trimmed());    
     }
-
-
 }
 
 //Add New Task
