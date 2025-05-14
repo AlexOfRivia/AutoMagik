@@ -21,6 +21,7 @@ public:
     void addCarToDatabase(const QString& make, const QString& model, const QString& engineType, int year, int mileage, int phoneNumber, const QString& idToken); //adding car to firebase
     void addNewWorkerToDatabase(const QString& workerName, const QString& position, const int experience, const int salary, const int age, const QString& idToken);//adding new worker to firebase
     QString getIdToken() const { return m_idToken; } // for getting token from firebase
+    QNetworkAccessManager* getNetworkAccessManager() const { return m_networkAccessManager;  } // to make http requests like get or post
 signals:
     void workerSignedIn(const QString& workerName);  // Signal emitted when the workers sign in successfully
     void managerSignedIn(const QString& managerName); //Signal emittes when the managers sign in successfully
@@ -39,6 +40,7 @@ private:
     QString m_idToken;  // Stores user ID token after sign-in
     QNetworkAccessManager* m_networkAccessManager;  // Network manager used to send requests
     QNetworkReply* m_networkReply;  // Stores the current network reply
+
 };
 
 #endif

@@ -47,7 +47,6 @@ AutoMagik::AutoMagik(QWidget* parent)
 
     ui.setupUi(this);
 
-    firebase.setAPIKey("AIzaSyB-IpfsuvwFD8b_fNBbOCM9eRoTKfODR9w"); //setting the API key to our data base ( we dont know how to use env vars yet so for now itll look like this )
 
     //API key loading
     QByteArray apiKeyEnvVar = qgetenv("API_NINJAS_KEY");
@@ -60,6 +59,20 @@ AutoMagik::AutoMagik(QWidget* parent)
         qWarning() << "WARNING: Environment variable 'API_NINJAS_KEY' not set or empty."
             << "Using placeholder key. API Ninjas functionality may fail.";
     }
+
+    //Same thing for the firebase key
+    QByteArray firebaseAPIKey = qgetenv("FIREBASE_KEY");
+    if (!firebaseAPIKey.isEmpty()) {
+        firebase.setAPIKey(QString::fromUtf8(firebaseAPIKey));
+        qDebug() << "Firebase Key loaded successfully from environment variable.";
+    }
+    else {
+        firebase.setAPIKey("YOUR_API_KEY_HERE_2");
+        qWarning() << "WARNING: Environment variable 'FIREBASE_KEY' not set or empty."
+            << "Using placeholder key. Firebase functionality may fail.";
+    }
+
+
 
     networkManager = new QNetworkAccessManager(this); //Initialize network manager
 
@@ -105,6 +118,7 @@ AutoMagik::AutoMagik(QWidget* parent)
 
             connect(&firebase, &Firebase::managerSignedIn, this, [this]() {
                 ui.stackedWidget->setCurrentIndex(4); // Manager panel
+                updateManagerTables();
                 });
             connect(&firebase, &Firebase::loginFailed, this, [this](const QString& error) {
                 QMessageBox::warning(this, "Login Error", error);
@@ -172,11 +186,6 @@ AutoMagik::AutoMagik(QWidget* parent)
 
 
 
-    //fetches data for our manager:
-    connect(&firebase, &Firebase::managerSignedIn, this, [this]() 
-        {
-            // TODO: gets data from the firebase and puts it in our dashboard once we log in
-        });
 
 
     //Manager Cars Page
@@ -286,12 +295,64 @@ AutoMagik::~AutoMagik()
     //No explicit delete ui; needed as ui object is part of the class
 }
 
+
+/*
+
+TODO IN UPDATEMANAGERTABLES:
+FIX IT NOT REFRESHING WHEN YOU USE THE FUNCTION, AND ONLY DOING SO AFTER LOGGING IN AGAIN
+( MAY HAVE SMTH TO DO WITH THE ID TOKEN NOT REFRESHING )
+
+*/
+
+
 //Helper function to update tables and buttons
 void AutoMagik::updateManagerTables()
 {
+
+
+    //Clearing up workers
+    workers.clear();
+    QString workerUrl = "https://automagik-96e43-default-rtdb.europe-west1.firebasedatabase.app/automagik/workers.json?auth=" + firebase.getIdToken();
+    //QString carUrl = "https://automagik-96e43-default-rtdb.europe-west1.firebasedatabase.app/automagik/cars.json?auth=" + firebase.getIdToken(); - cars will be implemented later
+    //Same will go for tasks
+
+
+    //Adding workers from db
+    QNetworkRequest workerRequest((QUrl(workerUrl)));
+    workerRequest.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+    QNetworkReply* workerReply = firebase.getNetworkAccessManager()->get(workerRequest); 
+
+    QEventLoop loop;
+    connect(workerReply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
+    loop.exec();
+
+    QByteArray data = workerReply->readAll();
+    QJsonDocument doc = QJsonDocument::fromJson(data);
+    QJsonObject allWorkers = doc.object();
+
+    for (const QString& key : allWorkers.keys()) {
+        QJsonObject workerData = allWorkers[key].toObject();
+        if (workerData["manager"].toString() == firebase.m_uid ) {
+            Worker w;
+            w.setWorkerID(workerData["w_id"].toInt());
+            w.setWorkerExperience(workerData["experience"].toInt());
+            w.setWorkerName(workerData["name"].toString().toStdString());
+            w.setWorkerAge(workerData["age"].toInt());
+            w.setPosition(workerData["position"].toString().toStdString());
+            w.setWorkerSalary(workerData["salary"].toInt());
+            workers.push_back(w);
+        }
+    }
+
+
     //Update Workers Table
     ui.workersTableWidget->setRowCount(0); //Clear existing rows first
     ui.workersTableWidget->setRowCount(static_cast<int>(workers.size()));
+
+
+
+
+
     for (int i = 0; i < static_cast<int>(workers.size()); ++i)
     {
         const Worker& worker = workers[i];
@@ -469,20 +530,22 @@ void AutoMagik::addWorker()
         newWorker.setWorkerAge(ageInput->value());
         //clockedIn false by default, assignedTask empty by default
 
-        workers.push_back(newWorker);
-        updateManagerTables(); //Refresh the UI
+        
+        
 
         //Adding worker to database
-            QVariantMap data;
-            data["w_id"] = QVariant(newWorker.getWorkerID()); 
-            data["name"] = QVariant(QString::fromStdString(newWorker.getWorkerName()));
-            data["position"] = QVariant(QString::fromStdString(newWorker.getPosition()));
-            data["experience"] = QVariant(newWorker.getWorkerExperience());
-            data["salary"] = QVariant(newWorker.getWorkerSalary());
-            data["age"] = QVariant(newWorker.getWorkerAge());
-            data["manager"] = QVariant(firebase.m_uid);  
-            //delete [] newWorker - THIS WILL ONLY BE NEEDED ONCE WE START DOWNLOAD FROM THE DB
-            firebase.addWorkerAccount(emailInput->text().trimmed(), data ,passwordInput->text().trimmed());    
+        QVariantMap data;
+        data["w_id"] = QVariant(newWorker.getWorkerID()); 
+        data["name"] = QVariant(QString::fromStdString(newWorker.getWorkerName()));
+        data["position"] = QVariant(QString::fromStdString(newWorker.getPosition()));
+        data["experience"] = QVariant(newWorker.getWorkerExperience());
+        data["salary"] = QVariant(newWorker.getWorkerSalary());
+        data["age"] = QVariant(newWorker.getWorkerAge());
+        data["manager"] = QVariant(firebase.m_uid);  
+        firebase.addWorkerAccount(emailInput->text().trimmed(), data ,passwordInput->text().trimmed());  
+
+        updateManagerTables(); //Refresh the UI
+        workers.push_back(newWorker);
     }
 }
 

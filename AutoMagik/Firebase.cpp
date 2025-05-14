@@ -37,7 +37,7 @@ void Firebase::signUserIn(const QString& emailAddress, const QString& password)
     QRegularExpressionMatch match = emailRegex.match(emailAddress);
 
     if (!match.hasMatch()) {
-        qDebug() << "Invalid email format. Write a properly email";
+        qDebug() << "Invalid email format. Write a proper email";
         return;
     }
 
