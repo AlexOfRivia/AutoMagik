@@ -12,6 +12,10 @@ Car::~Car()
 {
 
 }
+void Car::setFirebaseKey(std::string key) {
+    this->firebaseKey = key;
+}
+
 
 //Setting the car make
 void Car::setCarMake(std::string make)
@@ -50,6 +54,10 @@ void Car::setClientPhoneNumber(int phoneNumber)
 }
 
 //Setters
+std::string Car::getFirebaseKey() const {
+    return this->firebaseKey;
+}
+
 std::string Car::getMake() const
 {
     return this->carMake;
@@ -78,4 +86,16 @@ int Car::getCarMileage() const
 int Car::getClientPhoneNumber() const
 {
     return this->clientPhoneNumber;
+}
+
+
+
+bool Car::operator==(const Car& other) const
+{
+    return carMake == other.carMake &&
+        carModel == other.carModel &&
+        engineType == other.engineType &&
+        productionYear == other.productionYear &&
+        carMileage == other.carMileage &&
+        clientPhoneNumber == other.clientPhoneNumber;
 }
