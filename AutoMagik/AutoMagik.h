@@ -3,6 +3,7 @@
 #include <QtWidgets/QMainWindow>
 #include <vector>
 #include "ui_AutoMagik.h"
+#include "Firebase.h"
 #include "Car.h"
 #include "Task.h"
 #include "Worker.h"
@@ -38,29 +39,26 @@ private slots: /* slots are special member functions in Qt that can be connected
     void addCar();
     void addWorker();
     void addTask();
-    
+
     //Tasks
-    void editSelectedTask();    //Placeholder
-    void assignReassignTask();  //Placeholder
-    void deleteTask();          //Placeholder
+    void editSelectedTask();    
+    void assignReassignTask();  
+    void deleteTask();          
 
     //Cars
     void editSelectedCar();
-	void deleteSelectedCar();
+    void deleteSelectedCar();
 
     //Workers
     void editSelectedWorker();
-	void deleteSelectedWorker();
+    void deleteSelectedWorker();
 
 
     void updateManagerTables();
     void updateWorkerDashboard();
     void updateWorkerDashboardSelection();
-    void showCarInfo();         //Slot to trigger API calls
-    void handleNhtsaReplyFinished();
-    void handleApiNinjaReplyFinished();
-
-
+    void showCarInfo();
+   
 private:
     Ui::AutoMagikClass ui;
 
@@ -79,6 +77,7 @@ private:
     QString lastModelForDialog;
     int lastYearForDialog;
 
-    void checkAndShowCombinedInfoDialog(); //Checks if requests are done, then calls display
     void displayCarInfoDialog();           //Creates and displays the actual info dialog
+
+    Firebase firebase; //Creates firebase class for backend functionality
 };

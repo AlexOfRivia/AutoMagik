@@ -18,9 +18,9 @@ public:
 	//Getters
 	std::string getMake() const;
 	std::string getModel() const;
-	std::string getEngineType() const;       
-	int getProductionYear() const;            
-	int getCarMileage() const;                
+	std::string getEngineType() const;
+	int getProductionYear() const;
+	int getCarMileage() const;
 	int getClientPhoneNumber() const;
 
 	//Overloading the equality operator
