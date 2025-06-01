@@ -25,9 +25,6 @@ void Task::setPartsNeeded(std::string parts)
 	this->partsNeeded = parts;
 }
 
-void Task::setFirebaseKey(const std::string& key) {
-	this->firebaseKey = key;
-}
 //Setting the comments for the task
 void Task::setComments(std::string comments)
 {
@@ -63,6 +60,10 @@ void Task::setTaskPriority(priority prio)
 	this->taskPriority = prio;
 }
 
+void Task::setFirebaseKey(const std::string& key) {
+	this->firebaseKey = key;
+}
+
 //Getting the instructions for the task
 std::string Task::getTaskInstructions() const
 {
@@ -81,12 +82,6 @@ std::string Task::getComments() const
 	return this->comments;
 }
 
-std::string Task::getFirebaseKey() const {
-    return firebaseKey;
-}
-
-
-
 //Getting the ID for the task
 int Task::getTaskID() const
 {
@@ -104,11 +99,18 @@ std::string Task::getTaskCar() const
 	return this->taskCar.getMake() + " " + this->taskCar.getModel();
 }
 
+std::string Task::getFirebaseKey() const {
+	return firebaseKey;
+}
+
+
 //Getting the actual car object for the task
 const Car& Task::getCarObject() const
 {
 	return this->taskCar;
 }
+
+
 
 //Getting the status of the task
 std::string Task::getTaskStatus() const

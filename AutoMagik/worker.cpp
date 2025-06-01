@@ -6,7 +6,7 @@
 Worker::Worker()
 {
     this->clockedIn = false;
-    this->workerID = 0; 
+    this->workerID = 0;
     this->workerSalary = 0;
     this->workerExperience = 0;
     this->workerAge = 0;
@@ -60,7 +60,7 @@ void Worker::assignTask(const Task& task) {
 }
 
 void Worker::clearTask() {
-    this->assignedTask = Task(); 
+    this->assignedTask = Task();
     this->hasTask = false;
 }
 
@@ -101,7 +101,7 @@ std::string Worker::getEmail() const
 }
 
 std::string Worker::getAssignedTaskInfo() const {
-    if (hasTask) 
+    if (hasTask)
     {
         return assignedTask.getTaskCar() + ", " + assignedTask.getTaskInstructions();
     }

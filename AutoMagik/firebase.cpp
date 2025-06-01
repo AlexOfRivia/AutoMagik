@@ -101,13 +101,13 @@ void Firebase::addManagerAccount(const QString& email, const QString& password) 
                 emit registrationFailed("Failed to save manager data");
             }
             else {
-                emit managerAccountCreated(); 
+                emit managerAccountCreated();
             }
             });
         });
 }
 
-
+//adding worker in firebase atutenication
 void Firebase::addWorkerAccount(const QString& email, const QVariantMap& workerData, const QString& password) {
     QString signUpEndpoint = "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=" + m_apiKey;
 
@@ -142,13 +142,14 @@ void Firebase::addWorkerAccount(const QString& email, const QVariantMap& workerD
         localWorkerData["email"] = email;
         localWorkerData["password"] = password;
         localWorkerData["role"] = "worker";
+        localWorkerData["firebaseKey"] = uid; // Додаємо Firebase ключ до даних
 
         QNetworkRequest dbRequest((QUrl(dbUrl)));
         dbRequest.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
 
         QNetworkReply* dbReply = m_networkAccessManager->put(dbRequest, QJsonDocument::fromVariant(localWorkerData).toJson());
 
-        connect(dbReply, &QNetworkReply::finished, [this, dbReply]() {
+        connect(dbReply, &QNetworkReply::finished, [this, dbReply, uid]() {
             QByteArray dbResponse = dbReply->readAll();
             dbReply->deleteLater();
 
@@ -156,12 +157,11 @@ void Firebase::addWorkerAccount(const QString& email, const QVariantMap& workerD
                 emit registrationFailed("Failed to save worker data");
             }
             else {
-                emit workerAccountCreated(); //might be useful for smth
+                emit workerAccountCreated(uid); // Тепер передаємо uid
             }
             });
         });
 }
-
 
 
 // Helper function to send a POST request with JSON data
@@ -284,6 +284,7 @@ void Firebase::addCarToDatabase(const QString& make, const QString& model, const
 
     QVariantMap carData;
     carData["make"] = make;
+    carData["managerId"] = m_uid;
     carData["model"] = model;
     carData["engineType"] = engineType;
     carData["year"] = year;
@@ -311,71 +312,78 @@ void Firebase::addCarToDatabase(const QString& make, const QString& model, const
         });
 }
 
-
-//Function for adding workers to database
-void Firebase::addNewWorkerToDatabase(const QString& workerName, const QString& position, const int experience, const int salary, const int age, const QString& idToken)
+//uptade info in real-time firebase
+void Firebase::updateCarInDatabase(const QString& carId, const QString& make, const QString& model,
+    const QString& engineType, int year, int mileage, int phoneNumber,
+    const QString& idToken)
 {
-    QString dbUrl = "https://automagik-96e43-default-rtdb.europe-west1.firebasedatabase.app/automagik/workers.json?auth=" + idToken;
-    QVariantMap workerData;
-    workerData["name"] = workerName;
-    workerData["position"] = position;
-    workerData["experience"] = experience;
-    workerData["salary"] = salary;
-    workerData["age"] = age;
-    QNetworkRequest request((QUrl(dbUrl)));
-    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-
-    QNetworkReply* reply = m_networkAccessManager->post(request, QJsonDocument::fromVariant(workerData).toJson());
-
-    connect(reply, &QNetworkReply::finished, [this, reply]() {
-        QByteArray response = reply->readAll();
-        reply->deleteLater();
-
-        if (QJsonDocument::fromJson(response).object().contains("error")) {
-            qDebug() << "Failed to save worker data";
-        }
-        else {
-            qDebug() << "Worker added successfully";
-        }
-        });
-}
-
-void Firebase::updateWorkerInDatabase(const QString& workerId, const QVariantMap& workerData, const QString& idToken)
-{
-    if (workerId.isEmpty() || idToken.isEmpty()) {
-        qWarning() << "Worker ID or ID Token is empty. Cannot update.";
+    if (carId.isEmpty() || idToken.isEmpty()) {
+        qWarning() << "Cannot update car - empty carId or idToken";
         return;
     }
 
-    QString dbUrl = QString("https://automagik-96e43-default-rtdb.europe-west1.firebasedatabase.app/automagik/workers/")
-        + workerId + ".json?auth=" + idToken;
+    QString dbUrl = QString("https://automagik-96e43-default-rtdb.europe-west1.firebasedatabase.app")
+        + "/automagik/cars/" + carId + ".json?auth=" + idToken;
+
+    QVariantMap carData;
+    carData["make"] = make;
+    carData["model"] = model;
+    carData["managerId"] = m_uid;
+    carData["engineType"] = engineType;
+    carData["year"] = year;
+    carData["mileage"] = mileage;
+    carData["phoneNumber"] = phoneNumber;
 
     QNetworkRequest request((QUrl(dbUrl)));
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
 
-    QNetworkReply* reply = m_networkAccessManager->put(
-        request,
-        QJsonDocument::fromVariant(workerData).toJson()
-    );
+    QNetworkReply* reply = m_networkAccessManager->put(request, QJsonDocument::fromVariant(carData).toJson());
 
     connect(reply, &QNetworkReply::finished, [this, reply]() {
         QByteArray response = reply->readAll();
         reply->deleteLater();
 
         if (reply->error() != QNetworkReply::NoError) {
-            qWarning() << "Failed to update worker in database:" << reply->errorString();
-            emit databaseError("Failed to update worker: " + reply->errorString());
+            qWarning() << "Failed to update car:" << reply->errorString();
+            emit databaseError("Failed to update car: " + reply->errorString());
         }
         else {
-            qDebug() << "Worker updated successfully in Firebase.";
-            emit workerUpdated(); // you can connect this to UI updates
+            qDebug() << "Car updated successfully";
         }
         });
 }
+//delete car info from real-time firebase
+void Firebase::deleteCarFromDatabase(const QString& carId, const QString& idToken)
+{
+    if (carId.isEmpty() || idToken.isEmpty()) {
+        qWarning() << "Cannot delete car - empty carId or idToken";
+        return;
+    }
 
+    QString dbUrl = QString("https://automagik-96e43-default-rtdb.europe-west1.firebasedatabase.app")
+        + "/automagik/cars/" + carId + ".json?auth=" + idToken;
 
-//Function for adding data to firebase
+    QNetworkRequest request((QUrl(dbUrl)));
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
 
+    QNetworkReply* reply = m_networkAccessManager->deleteResource(request);
+
+    connect(reply, &QNetworkReply::finished, [this, reply, carId]() {
+        QByteArray response = reply->readAll();
+        reply->deleteLater();
+
+        if (reply->error() != QNetworkReply::NoError) {
+            qWarning() << "Failed to delete car:" << reply->errorString();
+            emit databaseError("Failed to delete car: " + reply->errorString());
+            return;
+        }
+
+        qDebug() << "Car deleted successfully, ID:" << carId;
+        emit carDeleted(carId);
+        });
+}
+
+//add task in real-time database
 void Firebase::addTaskToDatabase(const QString& carMake,
     const QString& carModel,
     const QString& instructions,
@@ -438,46 +446,73 @@ void Firebase::addTaskToDatabase(const QString& carMake,
         emit taskAdded(fbKey);
         });
 }
-
-
-
 //Update data in database
 void Firebase::updateTaskInDatabase(const QString& taskId, const QString& carMake, const QString& carModel,
     const QString& instructions, const QString& parts,
     const QString& comments, int workerId,
     const QString& status, const QString& priority,
-    const QString& idToken) {
+    const QString& idToken, const QString& workerName) {
 
-    // using task id and firebase id
     QString dbUrl = QString("https://automagik-96e43-default-rtdb.europe-west1.firebasedatabase.app")
         + "/automagik/tasks/" + taskId + ".json?auth=" + idToken;
-    QVariantMap taskData;
-    taskData["carMake"] = carMake;
-    taskData["carModel"] = carModel;
-    taskData["instructions"] = instructions;
-    taskData["parts"] = parts;
-    taskData["comments"] = comments;
-    taskData["workerId"] = workerId;
-    taskData["status"] = status;
-    taskData["priority"] = priority;
-    taskData["updatedAt"] = QDateTime::currentDateTime().toString(Qt::ISODate);
 
-    QNetworkRequest request((QUrl(dbUrl)));
-    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+    // ???????? ????????? ??????? ???? ??????
+    QNetworkRequest getRequest((QUrl(dbUrl)));
+    getRequest.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
 
-    QNetworkReply* reply = m_networkAccessManager->put(request, QJsonDocument::fromVariant(taskData).toJson());
+    QNetworkReply* getReply = m_networkAccessManager->get(getRequest);
 
-    connect(reply, &QNetworkReply::finished, [this, reply]() {
-        QByteArray response = reply->readAll();
-        reply->deleteLater();
+    connect(getReply, &QNetworkReply::finished, [this, getReply, taskId, carMake, carModel, instructions, parts,
+        comments, workerId, status, priority, idToken, workerName]() {
+            QByteArray response = getReply->readAll();
+            getReply->deleteLater();
 
-        if (QJsonDocument::fromJson(response).object().contains("error")) {
-            qDebug() << "Failed to update task data";
-            emit databaseError("Failed to update task");
-        }
-        else {
-            qDebug() << "Task updated successfully";
-        }
+            QJsonDocument currentData = QJsonDocument::fromJson(response);
+            if (currentData.isNull() || !currentData.isObject()) {
+                qWarning() << "Failed to get current task data for update";
+                emit databaseError("Failed to get current task data");
+                return;
+            }
+
+            QJsonObject taskData = currentData.object();
+
+            // ????????? ?????? ?? ????, ??? ???????? ???????
+            taskData["carMake"] = carMake;
+            taskData["carModel"] = carModel;
+            taskData["instructions"] = instructions;
+            taskData["parts"] = parts;
+            taskData["comments"] = comments;
+            taskData["workerId"] = workerId;
+            taskData["status"] = status;
+            taskData["priority"] = priority;
+            taskData["updatedAt"] = QDateTime::currentDateTime().toString(Qt::ISODate);
+
+            // ?????????? workerName, ???? ??? ?????????
+            if (!workerName.isEmpty()) {
+                taskData["workerName"] = workerName;
+            }
+
+            // ???????????? ???????? ????
+            QString updateUrl = QString("https://automagik-96e43-default-rtdb.europe-west1.firebasedatabase.app")
+                + "/automagik/tasks/" + taskId + ".json?auth=" + idToken;
+
+            QNetworkRequest putRequest((QUrl(updateUrl)));
+            putRequest.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+
+            QNetworkReply* putReply = m_networkAccessManager->put(putRequest, QJsonDocument(taskData).toJson());
+
+            connect(putReply, &QNetworkReply::finished, [this, putReply]() {
+                QByteArray response = putReply->readAll();
+                putReply->deleteLater();
+
+                if (QJsonDocument::fromJson(response).object().contains("error")) {
+                    qDebug() << "Failed to update task data";
+                    emit databaseError("Failed to update task");
+                }
+                else {
+                    qDebug() << "Task updated successfully";
+                }
+                });
         });
 }
 //delete task from database
@@ -511,78 +546,69 @@ void Firebase::deleteTaskFromDatabase(const QString& taskId, const QString& idTo
         });
 }
 
-void Firebase::deleteCarFromDatabase(const QString& carId, const QString& idToken)
+
+//Function for adding workers to database
+void Firebase::addNewWorkerToDatabase(const QString& workerName, const QString& position, const int experience, const int salary, const int age, const QString& idToken)
 {
-    if (carId.isEmpty() || idToken.isEmpty()) {
-        qWarning() << "Cannot delete car - empty carId or idToken";
-        return;
-    }
-
-    QString dbUrl = QString("https://automagik-96e43-default-rtdb.europe-west1.firebasedatabase.app")
-        + "/automagik/cars/" + carId + ".json?auth=" + idToken;
-
+    QString dbUrl = "https://automagik-96e43-default-rtdb.europe-west1.firebasedatabase.app/automagik/workers.json?auth=" + idToken;
+    QVariantMap workerData;
+    workerData["name"] = workerName;
+    workerData["position"] = position;
+    workerData["experience"] = experience;
+    workerData["salary"] = salary;
+    workerData["age"] = age;
     QNetworkRequest request((QUrl(dbUrl)));
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
 
-    QNetworkReply* reply = m_networkAccessManager->deleteResource(request);
+    QNetworkReply* reply = m_networkAccessManager->post(request, QJsonDocument::fromVariant(workerData).toJson());
 
-    connect(reply, &QNetworkReply::finished, [this, reply, carId]() {
+    connect(reply, &QNetworkReply::finished, [this, reply]() {
         QByteArray response = reply->readAll();
         reply->deleteLater();
 
-        if (reply->error() != QNetworkReply::NoError) {
-            qWarning() << "Failed to delete car:" << reply->errorString();
-            emit databaseError("Failed to delete car: " + reply->errorString());
-            return;
+        if (QJsonDocument::fromJson(response).object().contains("error")) {
+            qDebug() << "Failed to save worker data";
         }
-
-        qDebug() << "Car deleted successfully, ID:" << carId;
-        emit carDeleted(carId);
+        else {
+            qDebug() << "Worker added successfully";
+        }
         });
 }
-
-
-
-
-void Firebase::updateCarInDatabase(const QString& carId, const QString& make, const QString& model,
-    const QString& engineType, int year, int mileage, int phoneNumber,
-    const QString& idToken)
+//uptade worker info in real-time firebase
+void Firebase::updateWorkerInDatabase(const QString& workerId, const QVariantMap& workerData, const QString& idToken)
 {
-    if (carId.isEmpty() || idToken.isEmpty()) {
-        qWarning() << "Cannot update car - empty carId or idToken";
+    if (workerId.isEmpty() || idToken.isEmpty()) {
+        qWarning() << "Worker ID or ID Token is empty. Cannot update.";
         return;
     }
 
-    QString dbUrl = QString("https://automagik-96e43-default-rtdb.europe-west1.firebasedatabase.app")
-        + "/automagik/cars/" + carId + ".json?auth=" + idToken;
-
-    QVariantMap carData;
-    carData["make"] = make;
-    carData["model"] = model;
-    carData["engineType"] = engineType;
-    carData["year"] = year;
-    carData["mileage"] = mileage;
-    carData["phoneNumber"] = phoneNumber;
+    QString dbUrl = QString("https://automagik-96e43-default-rtdb.europe-west1.firebasedatabase.app/automagik/workers/")
+        + workerId + ".json?auth=" + idToken;
 
     QNetworkRequest request((QUrl(dbUrl)));
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
 
-    QNetworkReply* reply = m_networkAccessManager->put(request, QJsonDocument::fromVariant(carData).toJson());
+    QNetworkReply* reply = m_networkAccessManager->put(
+        request,
+        QJsonDocument::fromVariant(workerData).toJson()
+    );
 
     connect(reply, &QNetworkReply::finished, [this, reply]() {
         QByteArray response = reply->readAll();
         reply->deleteLater();
 
         if (reply->error() != QNetworkReply::NoError) {
-            qWarning() << "Failed to update car:" << reply->errorString();
-            emit databaseError("Failed to update car: " + reply->errorString());
+            qWarning() << "Failed to update worker in database:" << reply->errorString();
+            emit databaseError("Failed to update worker: " + reply->errorString());
         }
         else {
-            qDebug() << "Car updated successfully";
+            qDebug() << "Worker updated successfully in Firebase.";
+            emit workerUpdated(); // you can connect this to UI updates
         }
         });
 }
 
+//delete worker from real-time firebase
 void Firebase::deleteWorkerFromDatabase(const QString& workerId, const QString& idToken)
 {
     if (workerId.isEmpty() || idToken.isEmpty()) {
@@ -611,7 +637,7 @@ void Firebase::deleteWorkerFromDatabase(const QString& workerId, const QString& 
         }
         });
 }
-
+//delete worker from firebase authentication function
 void Firebase::deleteWorkerFromAuthentication(const QString& email)
 {
     if (email.isEmpty() || m_apiKey.isEmpty()) {
@@ -646,7 +672,6 @@ void Firebase::deleteWorkerFromAuthentication(const QString& email)
 }
 
 
-
 // Called after login to fetch additional user info from the database
 void Firebase::performAuthenticatedDatabaseCall()
 {
@@ -656,6 +681,4 @@ void Firebase::performAuthenticatedDatabaseCall()
     // Send GET request to database
     m_networkReply = m_networkAccessManager->get(QNetworkRequest(QUrl(endPoint)));
 }
-
-
 

@@ -41,9 +41,9 @@ private slots: /* slots are special member functions in Qt that can be connected
     void addTask();
 
     //Tasks
-    void editSelectedTask();    //Placeholder
-    void assignReassignTask();  //Placeholder
-    void deleteTask();          //Placeholder
+    void editSelectedTask();    
+    void assignReassignTask();  
+    void deleteTask();          
 
     //Cars
     void editSelectedCar();
@@ -57,11 +57,9 @@ private slots: /* slots are special member functions in Qt that can be connected
     void updateManagerTables();
     void updateWorkerDashboard();
     void updateWorkerDashboardSelection();
-    void showCarInfo();         //Slot to trigger API calls
-    void handleNhtsaReplyFinished();
-    void handleApiNinjaReplyFinished();
-
-
+    void showCarInfo();
+   //
+    void addCommentToTask();
 private:
     Ui::AutoMagikClass ui;
 
@@ -80,8 +78,7 @@ private:
     QString lastModelForDialog;
     int lastYearForDialog;
 
-    void checkAndShowCombinedInfoDialog(); //Checks if requests are done, then calls display
     void displayCarInfoDialog();           //Creates and displays the actual info dialog
-
+    int currentWorkerId = -1;
     Firebase firebase; //Creates firebase class for backend functionality
 };

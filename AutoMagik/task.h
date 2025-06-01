@@ -35,8 +35,7 @@ public:
 	void setTaskWorkerID(int id); //Set the ID of the worker assigned to the task
 	void setTaskStatus(status stat); //Set the status of the task;
 	void setTaskPriority(priority prio); //Set the priority of the task 
-	void setFirebaseKey(const std::string &key);
-
+	void setFirebaseKey(const std::string& key);
 	//Getters
 	std::string getTaskInstructions() const; //Get the instructions for the task
 	std::string getPartsNeeded() const; //Get the parts needed for the task
@@ -48,7 +47,6 @@ public:
 	std::string getTaskStatus() const; //Get the status of the task
 	std::string getTaskPriority() const; //Get the priority of the task
 	std::string getFirebaseKey() const; //Get key from firebase
-
 
 private:
 	std::string taskInstructions; //Instructions for the task

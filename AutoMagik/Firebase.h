@@ -22,48 +22,13 @@ public:
     void addNewWorkerToDatabase(const QString& workerName, const QString& position, const int experience, const int salary, const int age, const QString& idToken);//adding new worker to firebase
     QString getIdToken() const { return m_idToken; } // for getting token from firebase
     QNetworkAccessManager* getNetworkAccessManager() const { return m_networkAccessManager;  } // to make http requests like get or post
-    void deleteCarFromDatabase(const QString& carId, const QString& idToken);
-    void updateCarInDatabase(const QString& carId, const QString& make, const QString& model,
-        const QString& engineType, int year, int mileage, int phoneNumber,
-        const QString& idToken);
-    void addTaskToDatabase(const QString& carMake,
-        const QString& carModel,
-        const QString& instructions,
-        const QString& parts,
-        const QString& comments,
-        int workerId,
-        const QString& status,
-        const QString& priority,
-        const QString& idToken,
-        const QString& workerName);
-    void updateTaskInDatabase(const QString& taskId, const QString& carMake, const QString& carModel,
-        const QString& instructions, const QString& parts,
-        const QString& comments, int workerId,
-        const QString& status, const QString& priority,
-        const QString& idToken, const QString& workerName = QString());
-    void deleteTaskFromDatabase(const QString& taskId, const QString& idToken);
-    void updateWorkerInDatabase(const QString& workerId, const QVariantMap& workerData, const QString& idToken);
-    void deleteWorkerFromDatabase(const QString& workerId, const QString& idToken);
-    void deleteWorkerFromAuthentication(const QString& email);
 signals:
-    void taskUpdated();
     void workerSignedIn(const QString& workerName);  // Signal emitted when the workers sign in successfully
     void managerSignedIn(const QString& managerName); //Signal emittes when the managers sign in successfully
     void managerAccountCreated();  //Signal emitted when manager account was created successfully
-    void workerAccountCreated(const QString& firebaseKey); //same but for worker account
+    void workerAccountCreated(); //same but for worker account
     void loginFailed(const QString& errorMessage);  //signal emittes when the was an error during login
     void registrationFailed(const QString& errorMessage); //signal emittes when the was an error during registration
-    void carDeleted(const QString& carId);
-    void databaseError(const QString& errorMessage);
-    void carAdded(const QString& fbKey);
-    void taskAdded(const QString& fbKey);
-    void taskDeleted(const QString& taskId);
-    void workerUpdated();
-    void workerAdded(const QString& fbKey);
-    void workerDeleted(const QString& workerId);
-    void workerAuthDeleted();
-
-
 public slots:
     void networkReplyReadyRead();  // Slot called when a network reply has data ready
     void performAuthenticatedDatabaseCall();  // Slot to perform an authenticated GET request to Firebase Realtime DB
