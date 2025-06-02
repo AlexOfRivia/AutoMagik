@@ -185,10 +185,6 @@ AutoMagik::AutoMagik(QWidget* parent)
         firebase.addManagerAccount(email, password);
         });
 
-
-
-
-
     //Manager Cars Page
     QObject::connect(ui.managerBackButton2, &QPushButton::clicked, [this]() { ui.stackedWidget->setCurrentIndex(0); }); //Sign Out -> Mode Selection
     QObject::connect(ui.tasksButton, &QPushButton::clicked, [this]() { ui.stackedWidget->setCurrentIndex(4); });       //To Tasks Page
@@ -238,37 +234,51 @@ AutoMagik::AutoMagik(QWidget* parent)
 
 
     // logging in as worker:
-    QObject::connect(ui.workerLoginButton, &QPushButton::clicked, [this]()
-        {
-            QString email = ui.workerLoginEmail->toPlainText();
-            QString password = ui.workerPasswordLogin->toPlainText();
+    QObject::connect(ui.workerLoginButton, &QPushButton::clicked, [this]() {
+        QString email = ui.workerLoginEmail->toPlainText();
+        QString password = ui.workerPasswordLogin->toPlainText();
 
-            // turn off previous connection
-            QObject::disconnect(&firebase, &Firebase::managerSignedIn, nullptr, nullptr);
-            QObject::disconnect(&firebase, &Firebase::workerSignedIn, nullptr, nullptr);
+        QObject::disconnect(&firebase, &Firebase::managerSignedIn, nullptr, nullptr);
+        QObject::disconnect(&firebase, &Firebase::workerSignedIn, nullptr, nullptr);
 
-            firebase.signUserIn(email, password);
-            QObject::connect(&firebase, &Firebase::workerSignedIn, [this]()
-                {
-                    ui.stackedWidget->setCurrentIndex(5);
+
+        connect(&firebase, &Firebase::workerSignedIn, [this](const QString& workerName) {
+
+            QString workerUrl = QString("https://automagik-96e43-default-rtdb.europe-west1.firebasedatabase.app/automagik/workers.json?auth=%1")
+                .arg(firebase.getIdToken());
+
+            QNetworkRequest workerRequest((QUrl(workerUrl)));
+            QNetworkReply* workerReply = firebase.getNetworkAccessManager()->get(workerRequest);
+
+            connect(workerReply, &QNetworkReply::finished, [this, workerReply]() {
+                QByteArray data = workerReply->readAll();
+                QJsonDocument doc = QJsonDocument::fromJson(data);
+                QJsonObject allWorkers = doc.object();
+
+                for (const QString& key : allWorkers.keys()) {
+                    QJsonObject workerData = allWorkers[key].toObject();
+                    if (workerData["email"].toString() == ui.workerLoginEmail->toPlainText()) {
+                        this->currentWorkerId = workerData["w_id"].toInt();
+                        break;
+                    }
                 }
-            );
+
+                workerReply->deleteLater();
+                ui.stackedWidget->setCurrentIndex(5);
+                updateWorkerDashboard(); 
+                });
+            });
+
+        firebase.signUserIn(email, password);
         });
 
-
     //Worker Dashboard Page
-    QObject::connect(
-        ui.workerBackButton, &QPushButton::clicked, [this]() {
-            ui.stackedWidget->setCurrentIndex(0);
-            // Clear worker login fields
-            ui.workerLoginEmail->clear();
-            ui.workerPasswordLogin->clear();
-            // Also clear manager fields just in case
-            ui.managerLoginEmail->clear();
-            ui.managerPasswordLogin->clear();
-        }
-    );  //Sign Out -> Mode Selection
-
+    QObject::connect(ui.workerBackButton, &QPushButton::clicked, [this]() {
+        this->currentWorkerId = -1; // delete id during login
+        ui.stackedWidget->setCurrentIndex(0);
+        ui.workerLoginEmail->clear();
+        ui.workerPasswordLogin->clear();
+        });  //Sign Out -> Mode Selection
 
     //Worker dashboard connections
     //When the selected item in the task list changes, update the details view
@@ -278,6 +288,8 @@ AutoMagik::AutoMagik(QWidget* parent)
     QObject::connect(ui.carInfoButton, &QPushButton::clicked, this, &AutoMagik::showCarInfo);
 
 
+    //added button which adds comment from workers to comment
+    QObject::connect(ui.addCommentButton, &QPushButton::clicked, this, &AutoMagik::addCommentToTask);
     //Initial button states and table refresh
     updateManagerTables();
     updateWorkerDashboard(); //Initial population of worker dashboard (can be empty)
@@ -285,7 +297,6 @@ AutoMagik::AutoMagik(QWidget* parent)
     ui.markCompleteButton->setEnabled(false);
     ui.addCommentButton->setEnabled(false);
     ui.carInfoButton->setEnabled(false); //Initially, the car info button should be disabled
-
     //NOTE: Edit and Delete buttons are handled by updateManagerTables (for enabling/disabling)
 }
 
@@ -310,14 +321,11 @@ FIX IT NOT REFRESHING WHEN YOU USE THE FUNCTION, AND ONLY DOING SO AFTER LOGGING
 void AutoMagik::updateManagerTables()
 {
 
-
     //Clearing up workers
     workers.clear();
     QString workerUrl = "https://automagik-96e43-default-rtdb.europe-west1.firebasedatabase.app/automagik/workers.json?auth=" + firebase.getIdToken();
     //QString carUrl = "https://automagik-96e43-default-rtdb.europe-west1.firebasedatabase.app/automagik/cars.json?auth=" + firebase.getIdToken(); - cars will be implemented later
     //Same will go for tasks
-
-
     //Adding workers from db
     QNetworkRequest workerRequest((QUrl(workerUrl)));
     workerRequest.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
@@ -331,11 +339,9 @@ void AutoMagik::updateManagerTables()
     QJsonDocument doc = QJsonDocument::fromJson(data);
     QJsonObject allWorkers = doc.object();
 
-    for (const QString& key : allWorkers.keys()) 
-    {
+    for (const QString& key : allWorkers.keys()) {
         QJsonObject workerData = allWorkers[key].toObject();
-        if (workerData["manager"].toString() == firebase.m_uid ) 
-        {
+        if (workerData["manager"].toString() == firebase.m_uid) {
             Worker w;
             w.setWorkerID(workerData["w_id"].toInt());
             w.setWorkerExperience(workerData["experience"].toInt());
@@ -343,18 +349,15 @@ void AutoMagik::updateManagerTables()
             w.setWorkerAge(workerData["age"].toInt());
             w.setPosition(workerData["position"].toString().toStdString());
             w.setWorkerSalary(workerData["salary"].toInt());
+            w.setFirebaseKey(key.toStdString()); // adding firebase key
+            w.setEmail(workerData["email"].toString().toStdString()); // adding email
             workers.push_back(w);
         }
     }
 
-
     //Update Workers Table
     ui.workersTableWidget->setRowCount(0); //Clear existing rows first
     ui.workersTableWidget->setRowCount(static_cast<int>(workers.size()));
-
-
-
-
 
     for (int i = 0; i < static_cast<int>(workers.size()); ++i)
     {
@@ -437,38 +440,35 @@ void AutoMagik::updateManagerTables()
     //Other buttons
     ui.assignTaskButton->setEnabled(hasWorkers && hasTasks); //Need both workers and tasks to assign
     ui.addTaskButton->setEnabled(hasCars); //Can only add task if cars exist
+
+
 }
 
 //Update Worker Task List
-void AutoMagik::updateWorkerDashboard() 
-{
+void AutoMagik::updateWorkerDashboard() {
     ui.workerTaskListWidget->clear();
-
-    //Placeholder Logic: List all tasks
-    //TODO: Filter tasks based on the actual logged-in worker
-    for (size_t i = 0; i < tasks.size(); ++i) 
-    {
+    for (size_t i = 0; i < tasks.size(); ++i) {
         const auto& task = tasks[i];
+        if (currentWorkerId != -1 && task.getTaskWorkerID() != currentWorkerId) {
+            continue;
+        }
         QString carDesc = QString::fromStdString(task.getCarObject().getMake() + " " + task.getCarObject().getModel());
         QString instructionPreview = QString::fromStdString(task.getTaskInstructions());
-        if (instructionPreview.length() > 30) 
-        {
+        if (instructionPreview.length() > 30) {
             instructionPreview = instructionPreview.left(30) + QLatin1String("...");
         }
 
         QString itemText = QString("ID: %1 - %2 (%3)")
-            .arg(task.getTaskID())          //Task ID
-            .arg(carDesc)                   //Car Make + Model
-            .arg(instructionPreview);       //Short Instructions
+            .arg(task.getTaskID())
+            .arg(carDesc)
+            .arg(instructionPreview);
         QListWidgetItem* item = new QListWidgetItem(itemText);
-        //Store the original index from the tasks vector in the item's data
         item->setData(Qt::UserRole, QVariant::fromValue(static_cast<int>(i)));
         ui.workerTaskListWidget->addItem(item);
     }
-
-    updateWorkerDashboardSelection(); //Update details based on current selection (or lack thereof)
+    ui.addCommentButton->setEnabled(true);
+    updateWorkerDashboardSelection();
 }
-
 //Add New Worker
 void AutoMagik::addWorker()
 {
@@ -503,136 +503,130 @@ void AutoMagik::addWorker()
     QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, &dialog);
     formLayout->addRow(&buttonBox);
 
-    
+    connect(&buttonBox, &QDialogButtonBox::accepted, [&]()
+        {
+            QRegularExpression emailRegex(R"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)");
+            QRegularExpressionMatch match = emailRegex.match(emailInput->text().trimmed());
 
-    connect(&buttonBox, &QDialogButtonBox::accepted, [&]() 
-        {
-            //regex for email auth
-        QRegularExpression emailRegex(R"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)");
-        QRegularExpressionMatch match = emailRegex.match(emailInput->text().trimmed());
-
-        if (nameInput->text().trimmed().isEmpty() || positionInput->text().trimmed().isEmpty() || passwordInput->text().trimmed().isEmpty()) 
-        {
-            QMessageBox::warning(&dialog, QLatin1String("Input Error"), QLatin1String("Worker Name, Position and Password cannot be empty."));
-            //Keep dialog open
-        }
-        else if (!match.hasMatch()) 
-        {
-            QMessageBox::warning(&dialog, QLatin1String("Input Error"), QLatin1String("Email form is incorrect."));
-        } else {
-            dialog.accept(); //Close dialog
-        }
+            if (nameInput->text().trimmed().isEmpty() || positionInput->text().trimmed().isEmpty() || passwordInput->text().trimmed().isEmpty())
+            {
+                QMessageBox::warning(&dialog, QLatin1String("Input Error"), QLatin1String("Worker Name, Position and Password cannot be empty."));
+            }
+            else if (!match.hasMatch())
+            {
+                QMessageBox::warning(&dialog, QLatin1String("Input Error"), QLatin1String("Email form is incorrect."));
+            }
+            else
+            {
+                dialog.accept();
+            }
         });
     connect(&buttonBox, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
 
-    if (dialog.exec() == QDialog::Accepted) 
+    if (dialog.exec() == QDialog::Accepted)
     {
         Worker newWorker;
-        //Simple sequential ID - implement UUIDs or database IDs later
         newWorker.setWorkerID(static_cast<int>(workers.size()) + 1001);
         newWorker.setWorkerName(nameInput->text().trimmed().toStdString());
         newWorker.setPosition(positionInput->text().trimmed().toStdString());
         newWorker.setWorkerExperience(experienceInput->value());
         newWorker.setWorkerSalary(salaryInput->value());
         newWorker.setWorkerAge(ageInput->value());
-        //clockedIn false by default, assignedTask empty by default
 
-        
-        
-
-        //Adding worker to database
         QVariantMap data;
-        data["w_id"] = QVariant(newWorker.getWorkerID()); 
+        data["w_id"] = QVariant(newWorker.getWorkerID());
         data["name"] = QVariant(QString::fromStdString(newWorker.getWorkerName()));
         data["position"] = QVariant(QString::fromStdString(newWorker.getPosition()));
         data["experience"] = QVariant(newWorker.getWorkerExperience());
         data["salary"] = QVariant(newWorker.getWorkerSalary());
         data["age"] = QVariant(newWorker.getWorkerAge());
-        data["manager"] = QVariant(firebase.m_uid);  
-        firebase.addWorkerAccount(emailInput->text().trimmed(), data ,passwordInput->text().trimmed());  
+        data["manager"] = QVariant(firebase.m_uid);
 
-        workers.push_back(newWorker);
-        updateManagerTables(); //Refresh the UI
+        // Connect to the workerAccountCreated signal before adding the worker
+        connect(&firebase, &Firebase::workerAccountCreated, this,
+            [this, newWorker, email = emailInput->text().trimmed()](const QString& fbKey) {
+                Worker workerWithKey = newWorker;
+                workerWithKey.setFirebaseKey(fbKey.toStdString());
+                workerWithKey.setEmail(email.toStdString());
+                workers.push_back(workerWithKey);
+                updateManagerTables();
+            });
+
+        firebase.addWorkerAccount(emailInput->text().trimmed(), data, passwordInput->text().trimmed());
     }
 }
 
 //Add New Task
 void AutoMagik::addTask()
 {
-    if (cars.empty())
-    {
-        QMessageBox::information(this, QLatin1String("No Cars Available"), QLatin1String("Please add a car before adding a task."));
+    if (cars.empty()) {
+        QMessageBox::information(this, "No Cars Available", "Please add a car before adding a task.");
         return;
     }
 
     QDialog dialog(this);
-    dialog.setWindowTitle(QLatin1String("Add New Task"));
+    dialog.setWindowTitle("Add New Task");
     dialog.setMinimumWidth(450);
     QVBoxLayout* mainLayout = new QVBoxLayout(&dialog);
-
+    // Car selection
     QComboBox* carSelection = new QComboBox(&dialog);
-    for (size_t i = 0; i < cars.size(); ++i)
-    {
+    for (size_t i = 0; i < cars.size(); ++i) {
         const auto& car = cars[i];
-        carSelection->addItem(QString::fromStdString(car.getMake() + " " + car.getModel() + " (" + std::to_string(car.getProductionYear()) + ")"),
-            QVariant::fromValue(static_cast<int>(i))); //Store index in data role
+        carSelection->addItem(
+            QString::fromStdString(car.getMake() + " " + car.getModel() + " (" + std::to_string(car.getProductionYear()) + ")"),
+            QVariant::fromValue(static_cast<int>(i))
+        );
     }
-
+    // Worker selection
     QComboBox* workerComboBox = new QComboBox(&dialog);
-    if (!this->workers.empty())
-    {
-        for (const auto& worker : workers)
-        {
+    if (!workers.empty()) {
+        for (const auto& worker : workers) {
             workerComboBox->addItem(QString::fromStdString(worker.getWorkerName() + ", " + worker.getPosition()));
         }
     }
     else {
-        workerComboBox->addItem(QLatin1String("No Workers Available"));
-        workerComboBox->setDisabled(true); //Disabling the combobox if there are no workers
+        workerComboBox->addItem("No Workers Available");
+        workerComboBox->setDisabled(true);
     }
 
-    //Priority combo box
+    // Priority selection
     QComboBox* priorityComboBox = new QComboBox(&dialog);
-    priorityComboBox->addItem(QLatin1String("Low"), QVariant::fromValue(LOW));
-    priorityComboBox->addItem(QLatin1String("Medium"), QVariant::fromValue(MEDIUM));
-    priorityComboBox->addItem(QLatin1String("High"), QVariant::fromValue(HIGH));
+    priorityComboBox->addItem("Low", QVariant::fromValue(LOW));
+    priorityComboBox->addItem("Medium", QVariant::fromValue(MEDIUM));
+    priorityComboBox->addItem("High", QVariant::fromValue(HIGH));
 
+    // Inputs
     QTextEdit* instructionsInput = new QTextEdit(&dialog);
-    instructionsInput->setPlaceholderText(QLatin1String("Enter task instructions (required)"));
+    instructionsInput->setPlaceholderText("Enter task instructions (required)");
     instructionsInput->setMinimumHeight(80);
+
     QTextEdit* partsInput = new QTextEdit(&dialog);
-    partsInput->setPlaceholderText(QLatin1String("Enter parts needed (optional)"));
+    partsInput->setPlaceholderText("Enter parts needed (optional)");
     partsInput->setMinimumHeight(60);
+
     QTextEdit* initialCommentsInput = new QTextEdit(&dialog);
-    initialCommentsInput->setPlaceholderText(QLatin1String("Enter initial comments (optional)"));
+    initialCommentsInput->setPlaceholderText("Enter initial comments (optional)");
     initialCommentsInput->setMinimumHeight(60);
 
-    QFormLayout* form = new QFormLayout(); //Form layout
-    form->addRow(new QLabel(QLatin1String("Select Priority:"), &dialog)); //Priority selection
-    form->addWidget(priorityComboBox);
-
-    form->addRow(new QLabel(QLatin1String("Select Car:"), &dialog), carSelection); //Car selection
+    // Form layout
+    QFormLayout* form = new QFormLayout();
+    form->addRow(new QLabel("Priority:"), priorityComboBox);
+    form->addRow(new QLabel("Car:"), carSelection);
+    form->addRow(new QLabel("Worker:"), workerComboBox);
     mainLayout->addLayout(form);
-
-    form->addRow(new QLabel(QLatin1String("Select Worker:"), &dialog), workerComboBox); //Worker selection
-    mainLayout->addLayout(form);
-
-    mainLayout->addWidget(new QLabel(QLatin1String("Instructions:"), &dialog));
+    mainLayout->addWidget(new QLabel("Instructions:"));
     mainLayout->addWidget(instructionsInput);
-    mainLayout->addWidget(new QLabel(QLatin1String("Parts Needed:"), &dialog));
+    mainLayout->addWidget(new QLabel("Parts Needed:"));
     mainLayout->addWidget(partsInput);
-    mainLayout->addWidget(new QLabel(QLatin1String("Initial Comments:"), &dialog));
+    mainLayout->addWidget(new QLabel("Initial Comments:"));
     mainLayout->addWidget(initialCommentsInput);
-
     mainLayout->addStretch();
 
     QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, &dialog);
     mainLayout->addWidget(&buttonBox);
-
     connect(&buttonBox, &QDialogButtonBox::accepted, [&]() {
-        if (instructionsInput->toPlainText().trimmed().isEmpty())
-        {
-            QMessageBox::warning(&dialog, QLatin1String("Input Error"), QLatin1String("Task Instructions cannot be empty."));
+        if (instructionsInput->toPlainText().trimmed().isEmpty()) {
+            QMessageBox::warning(&dialog, "Input Error", "Task Instructions cannot be empty.");
         }
         else {
             dialog.accept();
@@ -641,40 +635,52 @@ void AutoMagik::addTask()
     connect(&buttonBox, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
 
     if (dialog.exec() == QDialog::Accepted) {
+        // Gather data into a Task
         Task newTask;
-        newTask.setTaskID(static_cast<int>(tasks.size()) + 5001); //Simple temporary ID
+        newTask.setTaskID(static_cast<int>(tasks.size()) + 5001);
         newTask.setTaskInstructions(instructionsInput->toPlainText().trimmed().toStdString());
         newTask.setPartsNeeded(partsInput->toPlainText().trimmed().toStdString());
         newTask.setComments(initialCommentsInput->toPlainText().trimmed().toStdString());
+        newTask.setTaskPriority(static_cast<priority>(priorityComboBox->currentData().toInt()));
 
-        priority selectedPriority = static_cast<priority>(priorityComboBox->currentData().toInt());
-        newTask.setTaskPriority(selectedPriority); //Set selected priority;
+        int carIndex = carSelection->currentData().toInt();
+        newTask.setTaskCar(cars[carIndex]);
 
-        int selectedCarDataIndex = carSelection->currentData().toInt(); //Get stored index
-        if (selectedCarDataIndex >= 0 && selectedCarDataIndex < static_cast<int>(cars.size()))
-        {
-            newTask.setTaskCar(cars[selectedCarDataIndex]); //Assign selected car by reference/copy
+        int workerId = 0;
+        QString workerName;
+        if (!workers.empty() && workerComboBox->currentIndex() >= 0) {
+            workerId = workers[workerComboBox->currentIndex()].getWorkerID();
+            workerName = QString::fromStdString(workers[workerComboBox->currentIndex()].getWorkerName());
         }
-        else {
-            QMessageBox::critical(this, QLatin1String("Error"), QLatin1String("Invalid car selection index."));
-            return; //Should not happen if populated correctly
-        }
-        int selectedWorkerIndex = workerComboBox->currentIndex();
-        if (selectedWorkerIndex >= 0 && selectedWorkerIndex < static_cast<int>(workers.size()))
-        {
-            this->workers[selectedWorkerIndex].assignTask(newTask); //Assign task to selected worker
-            newTask.setTaskWorkerID(workers[selectedWorkerIndex].getWorkerID()); //Set worker ID in task
-        } /*else {
-            QMessageBox::critical(this, QLatin1String("Error"), QLatin1String("Invalid worker selection index."));
-            return; //Should not happen if populated correctly
-        }*/
+        newTask.setTaskWorkerID(workerId);
+        newTask.setTaskStatus(NEW);
 
-        newTask.setTaskStatus(NEW); //Set default status to NEW
-
+        // Add to local list
+        int index = static_cast<int>(tasks.size());
         tasks.push_back(newTask);
+        updateManagerTables();
+        updateWorkerDashboard();
 
-        updateManagerTables(); //Refresh UI
-        updateWorkerDashboard(); //Also refresh worker view
+        // Connect to Firebase signal before sending
+        connect(&firebase, &Firebase::taskAdded, this, [this, index](const QString& fbKey) {
+            tasks[index].setFirebaseKey(fbKey.toStdString());
+            updateManagerTables();
+            });
+
+        // Send to Firebase
+        const Car& car = cars[carIndex];
+        firebase.addTaskToDatabase(
+            QString::fromStdString(car.getMake()),
+            QString::fromStdString(car.getModel()),
+            instructionsInput->toPlainText().trimmed(),
+            partsInput->toPlainText().trimmed(),
+            initialCommentsInput->toPlainText().trimmed(),
+            workerId,
+            "New",
+            priorityComboBox->currentText(),
+            firebase.getIdToken(),
+            workerName
+        );
     }
 }
 
@@ -799,6 +805,14 @@ void AutoMagik::addCar()
         //Also potentially update car selection dropdowns if they exist elsewhere
 
         if (!firebase.getIdToken().isEmpty()) {
+            int index = static_cast<int>(cars.size()) - 1; 
+            connect(&firebase, &Firebase::carAdded, this, [this, index](const QString& fbKey) {
+                if (index >= 0 && index < static_cast<int>(cars.size())) {
+                    cars[index].setFirebaseKey(fbKey.toStdString());
+                    updateManagerTables(); 
+                }
+                });
+
             firebase.addCarToDatabase(
                 QString::fromStdString(newCar.getMake()),
                 QString::fromStdString(newCar.getModel()),
@@ -978,21 +992,16 @@ void AutoMagik::showCarInfo()
         QMessageBox::warning(this, QLatin1String("No Task Selected"), QLatin1String("Please select a task from the list first."));
         return;
     }
-
     const Task& selectedTask = tasks[currentWorkerTaskIndex];
     const Car& associatedCar = selectedTask.getCarObject();
-
     //Store details for use when replies come back
     lastMakeForDialog = QString::fromStdString(associatedCar.getMake());
     lastModelForDialog = QString::fromStdString(associatedCar.getModel());
     lastYearForDialog = associatedCar.getProductionYear();
-
     //Clean model for API calls (basic split)
     QString modelForApi = lastModelForDialog.split(' ').first();
-
     ui.carInfoButton->setEnabled(false);
     ui.carInfoButton->setText(QLatin1String("Loading Web View..."));
-
 	this->displayCarInfoDialog(); //Show dialog immediately
 }
 
@@ -1031,82 +1040,79 @@ void AutoMagik::displayCarInfoDialog()
 	ui.carInfoButton->setText(QLatin1String("Browse Car Parts")); //Reset button text
 }
 
-
-
 //Function for adding tasks
-void AutoMagik::editSelectedTask()
-{
-    int rowIndex = ui.tasksTableWidget->currentRow(); //Get selected task index
-    if (rowIndex < 0 || rowIndex >= static_cast<int>(tasks.size())) //Checking if the selection is valid
-    {
-        QMessageBox::warning(this, QLatin1String("No Task Selected"), QLatin1String("Please select a task from the list first."));
+void AutoMagik::editSelectedTask() {
+    int rowIndex = ui.tasksTableWidget->currentRow();
+    if (rowIndex < 0 || rowIndex >= static_cast<int>(tasks.size())) {
+        QMessageBox::warning(this, "No Task Selected", "Please select a task from the list first.");
         return;
     }
-    //Get the selected task
-    Task& selectedTask = tasks[rowIndex];
 
+    Task& selectedTask = tasks[rowIndex];
+    QString taskId = QString::fromStdString(selectedTask.getFirebaseKey());
+
+    // Create dialog
     QDialog dialog(this);
-    dialog.setWindowTitle(QLatin1String("Edit Task"));
+    dialog.setWindowTitle("Edit Task");
     dialog.setMinimumWidth(450);
     QVBoxLayout* mainLayout = new QVBoxLayout(&dialog);
 
+    // Car selection combo box
     QComboBox* carSelection = new QComboBox(&dialog);
-    for (size_t i = 0; i < cars.size(); ++i)
-    {
+    int currentCarIndex = -1;
+    for (size_t i = 0; i < cars.size(); ++i) {
         const auto& car = cars[i];
-        carSelection->addItem(QString::fromStdString(car.getMake() + " " + car.getModel() + " (" + std::to_string(car.getProductionYear()) + ")"),
-            QVariant::fromValue(static_cast<int>(i))); //Store index in data role
+        QString carText = QString::fromStdString(car.getMake() + " " + car.getModel() + " (" + std::to_string(car.getProductionYear()) + ")");
+        carSelection->addItem(carText, static_cast<int>(i));
+
+        if (car == selectedTask.getCarObject()) {
+            currentCarIndex = static_cast<int>(i);
+        }
     }
+    if (currentCarIndex >= 0) carSelection->setCurrentIndex(currentCarIndex);
 
-
-    //Priority combo box
+    // Priority combo box
     QComboBox* priorityComboBox = new QComboBox(&dialog);
-    priorityComboBox->addItem(QLatin1String("Low"), QVariant::fromValue(LOW));
-    priorityComboBox->addItem(QLatin1String("Medium"), QVariant::fromValue(MEDIUM));
-    priorityComboBox->addItem(QLatin1String("High"), QVariant::fromValue(HIGH));
-    priorityComboBox->setCurrentText(QString::fromStdString(selectedTask.getTaskPriority())); //Set current index to task's priority
+    priorityComboBox->addItem("Low", LOW);
+    priorityComboBox->addItem("Medium", MEDIUM);
+    priorityComboBox->addItem("High", HIGH);
+    priorityComboBox->setCurrentText(QString::fromStdString(selectedTask.getTaskPriority()));
 
+    // Text fields
     QTextEdit* instructionsInput = new QTextEdit(&dialog);
     instructionsInput->setText(QString::fromStdString(selectedTask.getTaskInstructions()));
     instructionsInput->setMinimumHeight(80);
+
     QTextEdit* partsInput = new QTextEdit(&dialog);
-    partsInput->setPlaceholderText(QLatin1String("Enter parts needed (optional)"));
-    if (selectedTask.getPartsNeeded() != "") //Check if parts are needed
-    {
-        partsInput->setText(QString::fromStdString(selectedTask.getPartsNeeded()));
-    }
+    partsInput->setPlaceholderText("Enter parts needed (optional)");
+    partsInput->setText(QString::fromStdString(selectedTask.getPartsNeeded()));
     partsInput->setMinimumHeight(60);
+
     QTextEdit* initialCommentsInput = new QTextEdit(&dialog);
-    initialCommentsInput->setPlaceholderText(QLatin1String("Enter initial comments (optional)"));
-    if (selectedTask.getComments() != "") //Check if there are any comments
-    {
-        initialCommentsInput->setText(QString::fromStdString(selectedTask.getComments()));
-    }
+    initialCommentsInput->setPlaceholderText("Enter initial comments (optional)");
+    initialCommentsInput->setText(QString::fromStdString(selectedTask.getComments()));
     initialCommentsInput->setMinimumHeight(60);
 
-    QFormLayout* form = new QFormLayout(); //Form layout
-    form->addRow(new QLabel(QLatin1String("Select Priority:"), &dialog)); //Priority selection
-    form->addWidget(priorityComboBox);
-
-    form->addRow(new QLabel(QLatin1String("Select Car:"), &dialog), carSelection); //Car selection
+    // Layout
+    QFormLayout* form = new QFormLayout();
+    form->addRow("Select Priority:", priorityComboBox);
+    form->addRow("Select Car:", carSelection);
     mainLayout->addLayout(form);
 
-    mainLayout->addWidget(new QLabel(QLatin1String("Instructions:"), &dialog));
+    mainLayout->addWidget(new QLabel("Instructions:", &dialog));
     mainLayout->addWidget(instructionsInput);
-    mainLayout->addWidget(new QLabel(QLatin1String("Parts Needed:"), &dialog));
+    mainLayout->addWidget(new QLabel("Parts Needed:", &dialog));
     mainLayout->addWidget(partsInput);
-    mainLayout->addWidget(new QLabel(QLatin1String("Initial Comments:"), &dialog));
+    mainLayout->addWidget(new QLabel("Initial Comments:", &dialog));
     mainLayout->addWidget(initialCommentsInput);
-
-    mainLayout->addStretch();
 
     QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, &dialog);
     mainLayout->addWidget(&buttonBox);
 
+    // Dialog logic
     connect(&buttonBox, &QDialogButtonBox::accepted, [&]() {
-        if (instructionsInput->toPlainText().trimmed().isEmpty())
-        {
-            QMessageBox::warning(&dialog, QLatin1String("Input Error"), QLatin1String("Task Instructions cannot be empty."));
+        if (instructionsInput->toPlainText().trimmed().isEmpty()) {
+            QMessageBox::warning(&dialog, "Input Error", "Task Instructions cannot be empty.");
         }
         else {
             dialog.accept();
@@ -1114,120 +1120,156 @@ void AutoMagik::editSelectedTask()
         });
     connect(&buttonBox, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
 
+    // Finalize changes
     if (dialog.exec() == QDialog::Accepted) {
-        Task newTask;
-        newTask.setTaskID(static_cast<int>(tasks.size()) + 5001); //Simple temporary ID
-        newTask.setTaskInstructions(instructionsInput->toPlainText().trimmed().toStdString());
-        newTask.setPartsNeeded(partsInput->toPlainText().trimmed().toStdString());
-        newTask.setComments(initialCommentsInput->toPlainText().trimmed().toStdString());
+        // Update local task
+        selectedTask.setTaskInstructions(instructionsInput->toPlainText().trimmed().toStdString());
+        selectedTask.setPartsNeeded(partsInput->toPlainText().trimmed().toStdString());
+        selectedTask.setComments(initialCommentsInput->toPlainText().trimmed().toStdString());
+        selectedTask.setTaskPriority(static_cast<priority>(priorityComboBox->currentData().toInt()));
 
-        priority selectedPriority = static_cast<priority>(priorityComboBox->currentData().toInt());
-        newTask.setTaskPriority(selectedPriority); //Set selected priority;
-
-        int selectedCarDataIndex = carSelection->currentData().toInt(); //Get stored index
-        if (selectedCarDataIndex >= 0 && selectedCarDataIndex < static_cast<int>(cars.size()))
-        {
-            newTask.setTaskCar(cars[selectedCarDataIndex]); //Assign selected car by reference/copy
+        int selectedCarDataIndex = carSelection->currentData().toInt();
+        if (selectedCarDataIndex >= 0 && selectedCarDataIndex < static_cast<int>(cars.size())) {
+            selectedTask.setTaskCar(cars[selectedCarDataIndex]);
         }
         else {
-            QMessageBox::critical(this, QLatin1String("Error"), QLatin1String("Invalid car selection index."));
-            return; //Should not happen if populated correctly
+            QMessageBox::critical(this, "Error", "Invalid car selection index.");
+            return;
         }
 
-        newTask.setTaskStatus(NEW); //Set default status to NEW
+        // Update Firebase
+        firebase.updateTaskInDatabase(
+            taskId,
+            QString::fromStdString(selectedTask.getCarObject().getMake()),
+            QString::fromStdString(selectedTask.getCarObject().getModel()),
+            instructionsInput->toPlainText().trimmed(),
+            partsInput->toPlainText().trimmed(),
+            initialCommentsInput->toPlainText().trimmed(),
+            selectedTask.getTaskWorkerID(),
+            QString::fromStdString(selectedTask.getTaskStatus()),
+            priorityComboBox->currentText(),
+            firebase.getIdToken()
+        );
 
-        tasks[rowIndex] = newTask; //Update the task in the vector
-
-        updateManagerTables(); //Refresh UI
-        updateWorkerDashboard(); //Also refresh worker view
+        updateManagerTables();
+        updateWorkerDashboard();
     }
-
 }
-
 
 //Function for assigning/reassigning tasks to workers
 void AutoMagik::assignReassignTask()
 {
-    int selectedTaskIndex = ui.tasksTableWidget->currentRow(); //Getting the selected row index
-    if (selectedTaskIndex < 0 || selectedTaskIndex >= static_cast<int>(tasks.size())) //Checking if the selection is valid
+    int selectedTaskIndex = ui.tasksTableWidget->currentRow();
+    if (selectedTaskIndex < 0 || selectedTaskIndex >= static_cast<int>(tasks.size()))
     {
-        QMessageBox::warning(this, QLatin1String("No Task Selected"), QLatin1String("Please select a task from the list first."));
+        QMessageBox::warning(this, "No Task Selected", "Please select a task from the list first.");
+        return;
+    }
+    Task& selectedTask = tasks[selectedTaskIndex];
+    QString taskId = QString::fromStdString(selectedTask.getFirebaseKey());
+    int currentWorkerID = selectedTask.getTaskWorkerID();
+
+    if (taskId.isEmpty()) {
+        QMessageBox::warning(this, "Error", "Selected task has no Firebase ID");
         return;
     }
 
-    int currentWorkerID = this->tasks[selectedTaskIndex].getTaskWorkerID(); //Getting the current worker ID
+    QDialog dialog(this);
+    dialog.setWindowTitle("Assign/Reassign Task");
+    dialog.setMinimumWidth(450);
+    QVBoxLayout* mainLayout = new QVBoxLayout(&dialog);
 
-    QDialog* dialog = new QDialog(this); //Creating a dialog box
-    dialog->setWindowTitle(QLatin1String("Assign/Reassign Task"));
-    dialog->setMinimumWidth(450);
-    QVBoxLayout* mainLayout = new QVBoxLayout(dialog);
-    QFormLayout* form = new QFormLayout(); //Form layout
+    // Worker selection combo box
+    QComboBox* workerComboBox = new QComboBox(&dialog);
+    workerComboBox->addItem("Unassigned", 0); // Option to unassign task
 
-    QLabel* label = new QLabel(QLatin1String("Select Worker:"), dialog);
-    QComboBox* workerSelection = new QComboBox(dialog);
+    // Add all workers to the combo box
     for (const auto& worker : workers)
     {
-        workerSelection->addItem(QString::number(worker.getWorkerID()), QVariant(worker.getWorkerID())); //Adding a worker to the combo box
+        workerComboBox->addItem(
+            QString::fromStdString(worker.getWorkerName() + " (" + worker.getPosition() + ")"),
+            worker.getWorkerID()
+        );
     }
 
-    if (currentWorkerID != 0) //Checking if there is a worker assigned to the task
+    // Set current selection
+    if (currentWorkerID != 0)
     {
-        workerSelection->setCurrentText(QString::number(currentWorkerID)); //Setting the current combobox text to the assigned worker
-    }
-    else
-    {
-        workerSelection->setCurrentIndex(-1); //No worker assigned
+        int index = workerComboBox->findData(currentWorkerID);
+        if (index != -1) workerComboBox->setCurrentIndex(index);
     }
 
-    form->addRow(label, workerSelection); //Adding the label and combobox to the form
+    QFormLayout* form = new QFormLayout();
+    form->addRow("Select Worker:", workerComboBox);
     mainLayout->addLayout(form);
-    mainLayout->addStretch();
 
-    QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, dialog);
+    QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, &dialog);
     mainLayout->addWidget(&buttonBox);
 
-    connect(&buttonBox, &QDialogButtonBox::accepted, [&]() { dialog->accept(); });
-    connect(&buttonBox, &QDialogButtonBox::rejected, dialog, &QDialog::reject);
+    connect(&buttonBox, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
+    connect(&buttonBox, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
 
-    if (dialog->exec() == QDialog::Accepted)
+    if (dialog.exec() == QDialog::Accepted)
     {
-        int selectedWorkerID = workerSelection->currentData().toInt(); //Getting the selected worker ID
-
-        if (selectedWorkerID <= 0) //Checking if the selection is valid
-        {
-            QMessageBox::warning(this, QLatin1String("No Worker Selected"), QLatin1String("Please select a worker from the list first."));
+        int selectedWorkerID = workerComboBox->currentData().toInt();
+        // If selection didn't change, do nothing
+        if (selectedWorkerID == currentWorkerID) {
             return;
         }
+       // Get worker name for database update
+        QString workerName;
+        if (selectedWorkerID != 0) {
+            for (const auto& worker : workers) {
+                if (worker.getWorkerID() == selectedWorkerID) {
+                    workerName = QString::fromStdString(worker.getWorkerName());
+                    break;
+                }
+            }
+        }
+        // Update local task
+        selectedTask.setTaskWorkerID(selectedWorkerID);
 
-        //Clearing the task from the previous worker
-        if (currentWorkerID != 0)
-        {
-            for (auto& worker : workers)
-            {
-                if (worker.getWorkerID() == currentWorkerID)
-                {
-                    worker.clearTask(); //Clearing the task from the previous worker
+        // Update local workers
+        if (currentWorkerID != 0) {
+            for (auto& worker : workers) {
+                if (worker.getWorkerID() == currentWorkerID) {
+                    worker.clearTask();
                     break;
                 }
             }
         }
 
-        //Assigning the task to the new worker
-        for (auto& worker : workers)
-        {
-            if (worker.getWorkerID() == selectedWorkerID)
-            {
-                worker.assignTask(this->tasks[selectedTaskIndex]); //Assign the task to the selected worker
-                this->tasks[selectedTaskIndex].setTaskWorkerID(worker.getWorkerID()); //Updating the task's worker ID
-                break;
+        if (selectedWorkerID != 0) {
+            for (auto& worker : workers) {
+                if (worker.getWorkerID() == selectedWorkerID) {
+                    worker.assignTask(selectedTask);
+                    break;
+                }
             }
         }
 
-        updateManagerTables(); // Refreshing UI
-        updateWorkerDashboard(); // Also refreshing worker view
+        // Connect to Firebase signal before updating
+        connect(&firebase, &Firebase::taskUpdated, this, [this]() {
+            updateManagerTables();
+            updateWorkerDashboard();
+            });
+
+        // Update task in Firebase
+        firebase.updateTaskInDatabase(
+            taskId,
+            QString::fromStdString(selectedTask.getCarObject().getMake()),
+            QString::fromStdString(selectedTask.getCarObject().getModel()),
+            QString::fromStdString(selectedTask.getTaskInstructions()),
+            QString::fromStdString(selectedTask.getPartsNeeded()),
+            QString::fromStdString(selectedTask.getComments()),
+            selectedWorkerID,
+            QString::fromStdString(selectedTask.getTaskStatus()),
+            QString::fromStdString(selectedTask.getTaskPriority()),
+            firebase.getIdToken(),
+            workerName
+        );
     }
 }
-
 
 //Function for deleting tasks
 void AutoMagik::deleteTask()
@@ -1238,7 +1280,13 @@ void AutoMagik::deleteTask()
         QMessageBox::warning(this, QLatin1String("No Task Selected"), QLatin1String("Please select a task from the list first."));
         return;
     }
+    Task& selectedTask = tasks[selectedTaskIndex];
+    QString taskId = QString::fromStdString(selectedTask.getFirebaseKey());
 
+    if (taskId.isEmpty()) {
+        QMessageBox::warning(this, "Error", "Selected task has no Firebase ID");
+        return;
+    }
     QDialog* dialog = new QDialog(this); //Creating a dialog box
     dialog->setWindowTitle(QLatin1String("Delete Task"));
     dialog->setMinimumWidth(450);
@@ -1269,92 +1317,84 @@ void AutoMagik::deleteTask()
                 }
             }
         }
-
-        //Removing the task from the task vector
-        this->tasks.erase(tasks.begin() + selectedTaskIndex);
-
-        //Removing the row from the table
-        ui.tasksTableWidget->removeRow(selectedTaskIndex);
-
-
-
-        updateManagerTables(); //Refreshing UI
-        updateWorkerDashboard(); //Also refreshing worker view
+        //delete task from firebase
+        firebase.deleteTaskFromDatabase(taskId, firebase.getIdToken());
+        connect(&firebase, &Firebase::taskDeleted, this, [this, selectedTaskIndex](const QString& deletedTaskId) {
+            // cheching if key and id is valid
+            if (selectedTaskIndex < tasks.size()) {
+                if (QString::fromStdString(tasks[selectedTaskIndex].getFirebaseKey()) == deletedTaskId) {
+                    // delete task from vector
+                    tasks.erase(tasks.begin() + selectedTaskIndex);
+                    // delete from row
+                    ui.tasksTableWidget->removeRow(selectedTaskIndex);
+                    // update interfejs
+                    updateManagerTables();
+                    updateWorkerDashboard();
+                }
+            }
+            });
     }
 }
+
 
 //Function for editing cars
 void AutoMagik::editSelectedCar()
 {
-    int selectedCarIndex = ui.carsTableWidget->currentRow(); //Getting the selected row index
+    int selectedCarIndex = ui.carsTableWidget->currentRow();
     if (selectedCarIndex < 0 || selectedCarIndex >= static_cast<int>(cars.size())) {
         QMessageBox::warning(this, QLatin1String("No Car Selected"), QLatin1String("Please select a car from the list first."));
         return;
     }
 
-    QDialog dialog(this); //Oppening a dialog box
+    Car& selectedCar = cars[selectedCarIndex];
+    QString carId = QString::fromStdString(selectedCar.getFirebaseKey());
+
+    if (carId.isEmpty()) {
+        QMessageBox::warning(this, "Error", "Selected car has no Firebase ID");
+        return;
+    }
+
+    QDialog dialog(this);
     dialog.setWindowTitle(QLatin1String("Edit Car"));
     QVBoxLayout* mainLayout = new QVBoxLayout(&dialog);
 
-    //Inputs:
+    // Input fields
     QLineEdit* makeInput = new QLineEdit(&dialog);
-    makeInput->setText(QString::fromStdString(cars[selectedCarIndex].getMake()));
+    makeInput->setText(QString::fromStdString(selectedCar.getMake()));
+
     QLineEdit* modelInput = new QLineEdit(&dialog);
-    modelInput->setText(QString::fromStdString(cars[selectedCarIndex].getModel()));
+    modelInput->setText(QString::fromStdString(selectedCar.getModel()));
+
     QLineEdit* engineInput = new QLineEdit(&dialog);
-    engineInput->setText(QString::fromStdString(cars[selectedCarIndex].getEngineType()));
+    engineInput->setText(QString::fromStdString(selectedCar.getEngineType()));
+
     QComboBox* yearInput = new QComboBox(&dialog);
     int currentYear = QDate::currentDate().year();
     for (int i = currentYear; i >= 1900; i--) {
         yearInput->addItem(QString::number(i));
     }
-    yearInput->setCurrentText(QString::number(cars[selectedCarIndex].getProductionYear()));
-    QLineEdit* phoneNumberInput = new QLineEdit(&dialog);
-    phoneNumberInput->setText(QString::number(cars[selectedCarIndex].getClientPhoneNumber()));
+    yearInput->setCurrentText(QString::number(selectedCar.getProductionYear()));
 
-    //Phone number validation
+    QSpinBox* mileageInput = new QSpinBox(&dialog);
+    mileageInput->setSuffix(QLatin1String(" km"));
+    mileageInput->setRange(0, 3000000);
+    mileageInput->setValue(selectedCar.getCarMileage());
+
+    QLineEdit* phoneNumberInput = new QLineEdit(&dialog);
+    phoneNumberInput->setText(QString::number(selectedCar.getClientPhoneNumber()));
+
+    // Phone number validation
     QRegularExpression phoneRegex(QStringLiteral("^\\+?[\\d\\s]+$"));
     phoneNumberInput->setValidator(new QRegularExpressionValidator(phoneRegex, phoneNumberInput));
 
-    QFormLayout* formLayout = new QFormLayout(); //Creating a form layout
-    //Adding everything to the form input
+    QFormLayout* formLayout = new QFormLayout();
     formLayout->addRow(QLatin1String("Make:"), makeInput);
     formLayout->addRow(QLatin1String("Model:"), modelInput);
     formLayout->addRow(QLatin1String("Year:"), yearInput);
     formLayout->addRow(QLatin1String("Engine:"), engineInput);
+    formLayout->addRow(QLatin1String("Mileage:"), mileageInput);
     formLayout->addRow(QLatin1String("Owner Phone:"), phoneNumberInput);
 
-    //Rolling back mileage
-    QPushButton* reverseMileageButton = new QPushButton(QLatin1String("Rollback Mileage"), &dialog);
-    connect(reverseMileageButton, &QPushButton::clicked, this, [this, selectedCarIndex]() {
-
-        QDialog mileageDialog(this);
-        mileageDialog.setWindowTitle(QLatin1String("Rollback Mileage"));
-        QVBoxLayout mileageLayout(&mileageDialog);
-
-        //Mileage spinbox
-        QSpinBox* mileageInput = new QSpinBox(&mileageDialog);
-        int currentMileage = cars[selectedCarIndex].getCarMileage();
-        mileageInput->setRange(0, currentMileage);
-        mileageInput->setValue(currentMileage);
-        mileageInput->setSingleStep(10000);
-        mileageLayout.addWidget(mileageInput);
-
-        QDialogButtonBox mileageButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, &mileageDialog);
-        mileageLayout.addWidget(&mileageButtonBox);
-
-        connect(&mileageButtonBox, &QDialogButtonBox::accepted, [&]() {
-            int newMileage = mileageInput->value();
-            cars[selectedCarIndex].setCarMileage(newMileage);
-            updateManagerTables();
-            mileageDialog.accept();
-            });
-        connect(&mileageButtonBox, &QDialogButtonBox::rejected, &mileageDialog, &QDialog::reject);
-
-        mileageDialog.exec();
-        });
-
-    formLayout->addRow(reverseMileageButton);
     mainLayout->addLayout(formLayout);
 
     QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, &dialog);
@@ -1370,6 +1410,11 @@ void AutoMagik::editSelectedCar()
             return;
         }
 
+        if (phoneText.isEmpty()) {
+            QMessageBox::warning(&dialog, QLatin1String("Input Error"), QLatin1String("Owner Phone number cannot be empty."));
+            return;
+        }
+
         QString phoneCleaned = phoneText;
         phoneCleaned.remove(' ').remove('+');
         bool isNumeric;
@@ -1380,21 +1425,35 @@ void AutoMagik::editSelectedCar()
             return;
         }
 
-        //Setting the inputs to the car object
-        cars[selectedCarIndex].setCarMake(makeInput->text().trimmed().toStdString());
-        cars[selectedCarIndex].setCarModel(modelInput->text().trimmed().toStdString());
-        cars[selectedCarIndex].setEngineType(engineInput->text().trimmed().toStdString());
-        cars[selectedCarIndex].setProductionYear(yearInput->currentText().toInt());
-        cars[selectedCarIndex].setClientPhoneNumber(static_cast<int>(phoneLong));
-
-        updateManagerTables();
         dialog.accept();
         });
     connect(&buttonBox, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
+    if (dialog.exec() == QDialog::Accepted) {
+        // Update local car object
+        selectedCar.setCarMake(makeInput->text().trimmed().toStdString());
+        selectedCar.setCarModel(modelInput->text().trimmed().toStdString());
+        selectedCar.setEngineType(engineInput->text().trimmed().toStdString());
+        selectedCar.setProductionYear(yearInput->currentText().toInt());
+        selectedCar.setCarMileage(mileageInput->value());
 
-    dialog.exec();
+        QString phoneCleaned = phoneNumberInput->text().trimmed();
+        phoneCleaned.remove(' ').remove('+');
+        selectedCar.setClientPhoneNumber(phoneCleaned.toInt());
+        // Update Firebase
+        firebase.updateCarInDatabase(
+            carId,
+            makeInput->text().trimmed(),
+            modelInput->text().trimmed(),
+            engineInput->text().trimmed(),
+            yearInput->currentText().toInt(),
+            mileageInput->value(),
+            phoneCleaned.toInt(),
+            firebase.getIdToken()
+        );
+
+        updateManagerTables();
+    }
 }
-
 
 //Function for deleting cars
 void AutoMagik::deleteSelectedCar()
@@ -1433,106 +1492,259 @@ void AutoMagik::deleteSelectedCar()
 
     if (dialog->exec() == QDialog::Accepted)
     {
-        //Delete the selected car
-        cars.erase(cars.begin() + selectedCarIndex); //Remove the car from the vector
-        ui.carsTableWidget->removeRow(selectedCarIndex); //Remove the row from the table
+        // Get the Firebase key for the car (you'll need to store it when adding the car)
+        QString carId = QString::fromStdString(cars[selectedCarIndex].getFirebaseKey());
 
-        updateManagerTables(); //Refresh the UI
+        if (carId.isEmpty()) {
+            QMessageBox::warning(this, "Error", "Selected car has no Firebase ID");
+            return;
+        }
+
+        // Connect to the carDeleted signal before sending the delete request
+        connect(&firebase, &Firebase::carDeleted, this, [this, selectedCarIndex](const QString& deletedCarId) {
+            // Verify the deleted car matches our selection
+            if (selectedCarIndex < cars.size() &&
+                QString::fromStdString(cars[selectedCarIndex].getFirebaseKey()) == deletedCarId) {
+                // Remove from local vector
+                cars.erase(cars.begin() + selectedCarIndex);
+                // Remove from table
+                ui.carsTableWidget->removeRow(selectedCarIndex);
+                // Update UI
+                updateManagerTables();
+            }
+            });
+
+        // Delete from Firebase
+        firebase.deleteCarFromDatabase(carId, firebase.getIdToken());
     }
 }
-
 //Function for editing workers
 void AutoMagik::editSelectedWorker()
 {
-    int selectedWorkerIndex = ui.workersTableWidget->currentRow(); //Getting the selected row index
+    int selectedWorkerIndex = ui.workersTableWidget->currentRow();
+    if (selectedWorkerIndex < 0 || selectedWorkerIndex >= static_cast<int>(workers.size()))
+    {
+        QMessageBox::warning(this, "No Worker Selected", "Please select a worker from the list first.");
+        return;
+    }
+
+    Worker& selectedWorker = workers[selectedWorkerIndex];
+    QString workerId = QString::fromStdString(selectedWorker.getFirebaseKey());
+
+    if (workerId.isEmpty()) {
+        QMessageBox::warning(this, "Error", "Selected worker has no Firebase ID");
+        return;
+    }
+
     QDialog dialog(this);
-    dialog.setWindowTitle(QLatin1String("Edit Worker"));
+    dialog.setWindowTitle("Edit Worker");
     dialog.setMinimumWidth(400);
 
     QFormLayout* formLayout = new QFormLayout(&dialog);
 
     QLineEdit* nameInput = new QLineEdit(&dialog);
-    nameInput->setText(QString::fromStdString(workers[selectedWorkerIndex].getWorkerName()));
+    nameInput->setText(QString::fromStdString(selectedWorker.getWorkerName()));
+
     QLineEdit* positionInput = new QLineEdit(&dialog);
-    positionInput->setText(QString::fromStdString(workers[selectedWorkerIndex].getPosition()));
+    positionInput->setText(QString::fromStdString(selectedWorker.getPosition()));
+
     QSpinBox* experienceInput = new QSpinBox(&dialog);
-    experienceInput->setSuffix(QLatin1String(" years"));
+    experienceInput->setSuffix(" years");
     experienceInput->setRange(0, 60);
-    experienceInput->setValue(workers[selectedWorkerIndex].getWorkerExperience());
+    experienceInput->setValue(selectedWorker.getWorkerExperience());
+
     QSpinBox* salaryInput = new QSpinBox(&dialog);
-    salaryInput->setPrefix(QLatin1String("$ "));
+    salaryInput->setPrefix("$ ");
     salaryInput->setRange(0, 500000);
     salaryInput->setSingleStep(1000);
-    salaryInput->setValue(workers[selectedWorkerIndex].getWorkerSalary());
+    salaryInput->setValue(selectedWorker.getWorkerSalary());
+
     QSpinBox* ageInput = new QSpinBox(&dialog);
     ageInput->setRange(18, 100);
-    ageInput->setValue(workers[selectedWorkerIndex].getWorkerAge());
+    ageInput->setValue(selectedWorker.getWorkerAge());
 
-    formLayout->addRow(new QLabel(QLatin1String("Worker Name:"), &dialog), nameInput);
-    formLayout->addRow(new QLabel(QLatin1String("Position:"), &dialog), positionInput);
-    formLayout->addRow(new QLabel(QLatin1String("Experience:"), &dialog), experienceInput);
-    formLayout->addRow(new QLabel(QLatin1String("Salary:"), &dialog), salaryInput);
-    formLayout->addRow(new QLabel(QLatin1String("Age:"), &dialog), ageInput);
+    formLayout->addRow(new QLabel("Worker Name:"), nameInput);
+    formLayout->addRow(new QLabel("Position:"), positionInput);
+    formLayout->addRow(new QLabel("Experience:"), experienceInput);
+    formLayout->addRow(new QLabel("Salary:"), salaryInput);
+    formLayout->addRow(new QLabel("Age:"), ageInput);
 
     QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, &dialog);
     formLayout->addRow(&buttonBox);
 
     connect(&buttonBox, &QDialogButtonBox::accepted, [&]() {
         if (nameInput->text().trimmed().isEmpty() || positionInput->text().trimmed().isEmpty()) {
-            QMessageBox::warning(&dialog, QLatin1String("Input Error"), QLatin1String("Worker Name and Position cannot be empty."));
-            //Keep dialog open
+            QMessageBox::warning(&dialog, "Input Error", "Worker Name and Position cannot be empty.");
         }
         else {
-            dialog.accept(); //Close dialog
+            dialog.accept();
         }
         });
     connect(&buttonBox, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
 
     if (dialog.exec() == QDialog::Accepted)
     {
-        workers[selectedWorkerIndex].setWorkerName(nameInput->text().trimmed().toStdString());
-        workers[selectedWorkerIndex].setPosition(positionInput->text().trimmed().toStdString());
-        workers[selectedWorkerIndex].setWorkerExperience(experienceInput->value());
-        workers[selectedWorkerIndex].setWorkerSalary(salaryInput->value());
-        workers[selectedWorkerIndex].setWorkerAge(ageInput->value());
+        // Update local worker object
+        selectedWorker.setWorkerName(nameInput->text().trimmed().toStdString());
+        selectedWorker.setPosition(positionInput->text().trimmed().toStdString());
+        selectedWorker.setWorkerExperience(experienceInput->value());
+        selectedWorker.setWorkerSalary(salaryInput->value());
+        selectedWorker.setWorkerAge(ageInput->value());
 
-        updateManagerTables(); //Refresh the UI
+        // Prepare data for Firebase
+        QVariantMap workerData;
+        workerData["w_id"] = selectedWorker.getWorkerID();
+        workerData["name"] = nameInput->text().trimmed();
+        workerData["position"] = positionInput->text().trimmed();
+        workerData["experience"] = experienceInput->value();
+        workerData["salary"] = salaryInput->value();
+        workerData["age"] = ageInput->value();
+        workerData["email"] = QString::fromStdString(selectedWorker.getEmail()); 
+        workerData["manager"] = firebase.m_uid;
+        workerData["role"] = "worker"; 
+
+        // Connect to the workerUpdated signal before updating
+        connect(&firebase, &Firebase::workerUpdated, this, [this]() {
+            updateManagerTables();
+            });
+
+        // Update worker in Firebase
+        firebase.updateWorkerInDatabase(
+            workerId,
+            workerData,
+            firebase.getIdToken()
+        );
+        updateManagerTables();
     }
 }
-
 //Function for deleting workers
 void AutoMagik::deleteSelectedWorker()
 {
-    int selectedWorkerIndex = ui.workersTableWidget->currentRow(); //Getting the selected row index
-    if (selectedWorkerIndex < 0 || selectedWorkerIndex >= static_cast<int>(workers.size())) //Checking if the selection is valid
+    int selectedWorkerIndex = ui.workersTableWidget->currentRow();
+    if (selectedWorkerIndex < 0 || selectedWorkerIndex >= static_cast<int>(workers.size()))
     {
-        QMessageBox::warning(this, QLatin1String("No Car Selected"), QLatin1String("Please select a worker from the list first."));
+        QMessageBox::warning(this, "No Worker Selected", "Please select a worker from the list first.");
         return;
     }
 
-    QDialog* dialog = new QDialog(this);
-    dialog->setWindowTitle(QLatin1String("Delete Worker"));
-    dialog->setMinimumWidth(450);
-    QVBoxLayout* mainLayout = new QVBoxLayout(dialog);
-    QFormLayout* form = new QFormLayout();
+    Worker& selectedWorker = workers[selectedWorkerIndex];
+    QString workerId = QString::fromStdString(selectedWorker.getFirebaseKey());
+    QString workerEmail = QString::fromStdString(selectedWorker.getEmail());
 
-    form->addRow(new QLabel(QLatin1String("Are you sure you want to delete this worker?")));
-
-    mainLayout->addLayout(form);
-    mainLayout->addStretch();
-
-    QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, dialog);
-    mainLayout->addWidget(&buttonBox);
-
-    connect(&buttonBox, &QDialogButtonBox::accepted, dialog, &QDialog::accept);
-    connect(&buttonBox, &QDialogButtonBox::rejected, dialog, &QDialog::reject);
-
-    if (dialog->exec() == QDialog::Accepted)
-    {
-        //Delete the selected worker
-        workers.erase(workers.begin() + selectedWorkerIndex); //Remove the worker from the vector
-        ui.workersTableWidget->removeRow(selectedWorkerIndex); //Remove the row from the table
-
-        updateManagerTables(); //Refresh the UI
+    if (workerId.isEmpty()) {
+        QMessageBox::warning(this, "Error", "Selected worker has no Firebase ID");
+        return;
     }
+
+    // Check if worker has assigned tasks
+    bool hasTasks = false;
+    for (const auto& task : tasks) {
+        if (task.getTaskWorkerID() == selectedWorker.getWorkerID()) {
+            hasTasks = true;
+            break;
+        }
+    }
+
+    if (hasTasks) {
+        QMessageBox::warning(this, "Cannot Delete", "Worker has assigned tasks. Reassign or delete tasks first.");
+        return;
+    }
+
+    QDialog dialog(this);
+    dialog.setWindowTitle("Delete Worker");
+    dialog.setMinimumWidth(400);
+    QVBoxLayout* layout = new QVBoxLayout(&dialog);
+
+    QLabel* label = new QLabel("Are you sure you want to delete this worker?", &dialog);
+    layout->addWidget(label);
+
+    QDialogButtonBox buttonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, &dialog);
+    layout->addWidget(&buttonBox);
+
+    connect(&buttonBox, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
+    connect(&buttonBox, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
+
+    if (dialog.exec() == QDialog::Accepted)
+    {
+        //Lamba after successfull deleting workers
+        auto removeWorkerFromLocalList = [this, workerId]() {
+            auto it = std::find_if(workers.begin(), workers.end(),
+                [workerId](const Worker& w) {
+                    return QString::fromStdString(w.getFirebaseKey()) == workerId;
+                });
+            if (it != workers.end()) {
+                workers.erase(it);
+                updateManagerTables();
+            }
+            };
+
+        // connect signals before deleting
+        connect(&firebase, &Firebase::workerDeleted, this, removeWorkerFromLocalList);
+        connect(&firebase, &Firebase::workerAuthDeleted, this, []() {
+            qDebug() << "Worker authentication deleted successfully";
+            });
+
+        // delete from autentification
+        firebase.deleteWorkerFromAuthentication(workerEmail);
+
+        // delete from real_time firebase
+        firebase.deleteWorkerFromDatabase(workerId, firebase.getIdToken());
+    }
+}
+
+// Add this method to AutoMagik.cpp
+void AutoMagik::addCommentToTask()
+{
+    if (currentWorkerTaskIndex < 0 || currentWorkerTaskIndex >= static_cast<int>(tasks.size())) {
+        QMessageBox::warning(this, "No Task Selected", "Please select a task first.");
+        return;
+    }
+
+    QString newComment = ui.newCommentLineEdit->text().trimmed();
+    if (newComment.isEmpty()) {
+        QMessageBox::warning(this, "Empty Comment", "Please enter a comment before adding.");
+        return;
+    }
+
+    Task& selectedTask = tasks[currentWorkerTaskIndex];
+
+    // Append new comment to existing comments
+    QString currentComments = QString::fromStdString(selectedTask.getComments());
+    if (!currentComments.isEmpty()) {
+        currentComments += "\n\n"; // Add separation between comments
+    }
+    currentComments += newComment;
+
+    // Update local task
+    selectedTask.setComments(currentComments.toStdString());
+
+    // Update UI
+    ui.commentsTextEdit->setPlainText(currentComments);
+    ui.newCommentLineEdit->clear();
+
+    // Update database
+    QString taskId = QString::fromStdString(selectedTask.getFirebaseKey());
+    if (taskId.isEmpty()) {
+        QMessageBox::warning(this, "Error", "Task has no Firebase ID");
+        return;
+    }
+
+    // Connect to Firebase signal before updating
+    connect(&firebase, &Firebase::taskUpdated, this, [this]() {
+        QMessageBox::information(this, "Success", "Comment added successfully!");
+        });
+
+    // Update task in Firebase
+    firebase.updateTaskInDatabase(
+        taskId,
+        QString::fromStdString(selectedTask.getCarObject().getMake()),
+        QString::fromStdString(selectedTask.getCarObject().getModel()),
+        QString::fromStdString(selectedTask.getTaskInstructions()),
+        QString::fromStdString(selectedTask.getPartsNeeded()),
+        currentComments,
+        selectedTask.getTaskWorkerID(),
+        QString::fromStdString(selectedTask.getTaskStatus()),
+        QString::fromStdString(selectedTask.getTaskPriority()),
+        firebase.getIdToken()
+    );
 }

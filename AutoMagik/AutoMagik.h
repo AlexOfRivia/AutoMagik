@@ -58,7 +58,8 @@ private slots: /* slots are special member functions in Qt that can be connected
     void updateWorkerDashboard();
     void updateWorkerDashboardSelection();
     void showCarInfo();
-   
+   //
+    void addCommentToTask();
 private:
     Ui::AutoMagikClass ui;
 
@@ -78,6 +79,6 @@ private:
     int lastYearForDialog;
 
     void displayCarInfoDialog();           //Creates and displays the actual info dialog
-
+    int currentWorkerId = -1;
     Firebase firebase; //Creates firebase class for backend functionality
 };

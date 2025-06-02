@@ -14,6 +14,7 @@ public:
 	void setProductionYear(int year); //Setting the production year of the car
 	void setCarMileage(int mileage); //Setting the mileage of the car
 	void setClientPhoneNumber(int phoneNumber); //Setting the client phone number
+	void setFirebaseKey(std::string key);
 
 	//Getters
 	std::string getMake() const;
@@ -22,6 +23,7 @@ public:
 	int getProductionYear() const;
 	int getCarMileage() const;
 	int getClientPhoneNumber() const;
+	std::string getFirebaseKey() const;
 
 	//Overloading the equality operator
 	bool operator==(const Car& other) const;
@@ -34,7 +36,7 @@ private:
 	int productionYear; //Year the car was produced
 	int carMileage; //Mileage of the car
 	int clientPhoneNumber; //Phone number of the client
-
+	std::string firebaseKey;
 
 
 };

@@ -6,7 +6,7 @@
 Worker::Worker()
 {
     this->clockedIn = false;
-    this->workerID = 0; 
+    this->workerID = 0;
     this->workerSalary = 0;
     this->workerExperience = 0;
     this->workerAge = 0;
@@ -17,6 +17,13 @@ Worker::Worker()
 Worker::~Worker()
 {
     //Nothing dynamic to delete currently
+}
+void Worker::setFirebaseKey(const std::string& key) {
+    this->firebaseKey = key;
+}
+void Worker::setEmail(const std::string& email)
+{
+    this->email = email;
 }
 
 void Worker::setWorkerID(int id) {
@@ -53,7 +60,7 @@ void Worker::assignTask(const Task& task) {
 }
 
 void Worker::clearTask() {
-    this->assignedTask = Task(); 
+    this->assignedTask = Task();
     this->hasTask = false;
 }
 
@@ -84,9 +91,17 @@ int Worker::getWorkerAge() const {
 bool Worker::isClockedIn() const {
     return this->clockedIn;
 }
+std::string Worker::getFirebaseKey() const {
+    return firebaseKey;
+}
+
+std::string Worker::getEmail() const
+{
+    return this->email;
+}
 
 std::string Worker::getAssignedTaskInfo() const {
-    if (hasTask) 
+    if (hasTask)
     {
         return assignedTask.getTaskCar() + ", " + assignedTask.getTaskInstructions();
     }
