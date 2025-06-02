@@ -12,4 +12,9 @@
     <file alias="add_comment.svg">icons/add_comment.svg</file>
 	<file alias="info.svg">icons/info.svg</file>
 </qresource>
+
+<qresource prefix="/fonts"> //czcionka
+    <file alias="tektur.ttf">fonts/Tektur.ttf</file>
+</qresource>
+
 </RCC>
