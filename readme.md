@@ -1,4 +1,4 @@
-# AutoMagik - web application for a car workshop
+# AutoMagik - native desktop application for a car workshop
 
 ## AutoMagik is a fully functional example project written in C++ using Qt, designed to support the management of a local car repair workshop. It provides a desktop client interface for workshop employees (managers and workers) to handle service orders, internal communication, and vehicle data collection. The backend is powered by Firebase for real-time synchronization and cloud storage.
 
@@ -33,7 +33,7 @@ The purpose of AutoMagik is to present the assumptions and specifications for ve
 - Communicate internally via task-specific comments
 - Sync all information in real time through a Firebase backend
 
-Only authorized users (workshop employees with active accounts) can access the system. The application requires an active internet connection to synchronize with Firebase and communicate with any external vehicle APIs.
+Only authorized users (workshop employees with active accounts) can access the system. The application requires an active internet connection to synchronize with Firebase.
 
 ---
 
@@ -43,7 +43,6 @@ Only authorized users (workshop employees with active accounts) can access the s
 - C++ 17  
 - Qt 6 (Qt Widgets)  
 - Firebase Realtime Database (client-side SDK)  
-- Google Vehicle Data API (optional integration)
 
 ## Key Features
 
@@ -74,7 +73,6 @@ Each mode unlocks a distinct set of functions, as detailed below.
    - Add, edit, or remove vehicle records (each vehicle represents one client)  
    - View client history and associated tasks  
    - Attach vehicle details (make, model, license plate, VIN, etc.)  
-   - Optionally fetch additional vehicle specs via an external API
 
 4. **System Administration**  
    - Oversee data integrity and consistency  
