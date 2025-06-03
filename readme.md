@@ -72,7 +72,7 @@ Each mode unlocks a distinct set of functions, as detailed below.
 3. **Vehicle & Client Management**  
    - Add, edit, or remove vehicle records (each vehicle represents one client)  
    - View client history and associated tasks  
-   - Attach vehicle details (make, model, license plate, VIN, etc.)  
+   - Attach vehicle details (make, model etc.)  
 
 4. **System Administration**  
    - Oversee data integrity and consistency  
@@ -133,14 +133,13 @@ Below is a brief overview of each main interface screen:
 - **Purpose:** Manage the list of vehicles (clients).  
 - Each vehicle record includes:  
   - Owner Name  
-  - Vehicle Make & Model  
-  - License Plate / VIN  
+  - Vehicle Make & Model   
   - Contact Information  
 - Actions:  
   - **Add Vehicle (New Client)**  
   - **Edit Vehicle Details**  
   - **Delete Vehicle**  
-  - **Search / Filter** by license plate, owner, or VIN  
+  - **Search / Filter**
 
 > In AutoMagik, “Client” is synonymous with “Vehicle”—each vehicle entry represents one client.
 
@@ -198,11 +197,9 @@ Before installing and building AutoMagik, ensure you have the following installe
 
 2. **C++17-Compatible Compiler**  
    - Windows: MSVC 2019 or newer (via Visual Studio)  
-   - macOS: Xcode (12.0 or newer)  
-   - Linux: GCC 9.0 or newer / Clang 10.0 or newer
 
 3. **CMake 3.16+ (optional)**  
-   - If you prefer to build via CMake rather than qmake.
+   - If you prefer to build via CMake rather than qmake or Visual Studio sln
 
 4. **Git**  
    - For cloning the repository and managing version control.
@@ -221,8 +218,8 @@ Before installing and building AutoMagik, ensure you have the following installe
 ### Clone and Configure
 1. **Clone the Repository**  
    Open Terminal:
-   ```bash
-   git clone https://github.com/<your-username>/AutoMagik.git
+   ```
+   git clone https://github.com/AlexOfRivia/AutoMagik.git
    cd AutoMagik
    ```
 
@@ -248,10 +245,10 @@ Example:
 }
 ```
 
-### Building on Windows/macOS/Linux
-Using Qt Creator:
-    1. Open AutoMagik.pro in Qt Creator.
-    2. Configure a build kit for your OS (e.g. MinGW, MSVC, Clang).
+### Building on Windows
+Using Visual Studio:
+    1. Open AutoMagik.sln in Visual Studio.
+    2. Configure the MSVC build kit.
     3. Click Build > Run.
 
 ### Running the Application
@@ -259,13 +256,11 @@ Using Qt Creator:
 Running the Application
 After building, you can run the application directly:
 
-- **From Qt Creator:**
+- **From Visual Studio:**
   -  Press Run.
 - **From terminal:**
-  - On Linux/macOS:
-    ```sh./AutoMagik```
   - On Windows:
-   ```shAutoMagik.exe```
+   ```AutoMagik.exe```
 
 Make sure your Firebase credentials and configuration are correctly set up. On first launch, log in using the provided manager credentials.
 
@@ -273,4 +268,4 @@ Make sure your Firebase credentials and configuration are correctly set up. On f
 
 ## Keywords 
 Qt C++ Car Repair Workshop Management Desktop App Firebase Qt6 Automotive Task Tracking Employee Manager
-AutoMagik Mechanic Shop Repair Order System Cross-Platform GUI CRM
+AutoMagik Mechanic Shop Repair Order System  GUI CRM
