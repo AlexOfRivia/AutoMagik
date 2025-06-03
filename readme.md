@@ -4,7 +4,8 @@
 
 ## Table of Contents
 
-- [Overview](#overview)  
+- [Overview](#overview)
+- [Technologies used](#technologies-used)
 - [Key Features](#key-features)  
   - [User Modes](#user-modes)  
   - [Manager Functions](#manager-functions)  
