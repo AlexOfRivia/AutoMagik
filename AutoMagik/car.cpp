@@ -12,6 +12,10 @@ Car::~Car()
 {
 
 }
+void Car::setFirebaseKey(std::string key) {
+    this->firebaseKey = key;
+}
+
 
 //Setting the car make
 void Car::setCarMake(std::string make)
@@ -50,6 +54,10 @@ void Car::setClientPhoneNumber(int phoneNumber)
 }
 
 //Setters
+std::string Car::getFirebaseKey() const {
+    return this->firebaseKey;
+}
+
 std::string Car::getMake() const
 {
     return this->carMake;

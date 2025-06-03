@@ -60,6 +60,20 @@ void Task::setTaskPriority(priority prio)
 	this->taskPriority = prio;
 }
 
+void Task::setFirebaseKey(const std::string& key) {
+	this->firebaseKey = key;
+}
+
+void Task::setWorkerFirebaseKey(const std::string& key)
+{
+	this->workerFirebaseKey = key;
+}
+
+void Task::setCarFirebaseKey(const std::string& key)
+{
+	this->carFirebaseKey = key;
+}
+
 //Getting the instructions for the task
 std::string Task::getTaskInstructions() const
 {
@@ -95,16 +109,32 @@ std::string Task::getTaskCar() const
 	return this->taskCar.getMake() + " " + this->taskCar.getModel();
 }
 
+std::string Task::getFirebaseKey() const {
+	return firebaseKey;
+}
+
+
 //Getting the actual car object for the task
 const Car& Task::getCarObject() const
 {
 	return this->taskCar;
 }
 
+std::string Task::getWorkerFirebaseKey() const
+{
+	return this->workerFirebaseKey;
+}
+
+
+std::string Task::getCarFirebaseKey() const
+{
+	return this->carFirebaseKey;
+}
+
 //Getting the status of the task
 std::string Task::getTaskStatus() const
 {
-	switch (this->taskStatus) 
+	switch (this->taskStatus)
 	{
 	case NEW: return "New";
 	case IN_PROGRESS: return "In Progress";
@@ -124,4 +154,21 @@ std::string Task::getTaskPriority() const
 	case HIGH: return "High";
 	default: return "Unknown";
 	}
+}
+
+
+status Task::statusFromString(const std::string& str)
+{
+	if (str == "New") return status::NEW;
+	if (str == "In Progress") return status::IN_PROGRESS;
+	if (str == "Completed") return status::COMPLETED;
+	if (str == "Cancelled") return status::CANCELLED;
+}
+
+
+priority Task::priorityFromString(const std::string& str)
+{
+	if (str == "Low") return priority::LOW;
+	if (str == "Medium") return priority::MEDIUM;
+	if (str == "High") return priority::HIGH;
 }

@@ -25,7 +25,7 @@ class Task
 public:
 	Task(); //Constructor
 	~Task(); //Destructor
-	
+
 	//Setters
 	void setTaskInstructions(std::string instructions); //Set the instructions for the task
 	void setPartsNeeded(std::string parts); //Set the parts needed for the task
@@ -35,7 +35,9 @@ public:
 	void setTaskWorkerID(int id); //Set the ID of the worker assigned to the task
 	void setTaskStatus(status stat); //Set the status of the task;
 	void setTaskPriority(priority prio); //Set the priority of the task 
-
+	void setFirebaseKey(const std::string& key);
+	void setWorkerFirebaseKey(const std::string& key);
+	void setCarFirebaseKey(const std::string& key);
 	//Getters
 	std::string getTaskInstructions() const; //Get the instructions for the task
 	std::string getPartsNeeded() const; //Get the parts needed for the task
@@ -46,7 +48,13 @@ public:
 	const Car& getCarObject() const; //Get the actual Car object
 	std::string getTaskStatus() const; //Get the status of the task
 	std::string getTaskPriority() const; //Get the priority of the task
+	std::string getFirebaseKey() const; //Get key from firebase
+	std::string getWorkerFirebaseKey() const;
+	std::string getCarFirebaseKey() const;
 
+	//changing from string to custom types
+	status statusFromString(const std::string& str);
+	priority priorityFromString(const std::string& str);
 
 private:
 	std::string taskInstructions; //Instructions for the task
@@ -54,7 +62,14 @@ private:
 	std::string comments; //Comments on the task
 	int taskID = 0; //ID of the task
 	Car taskCar; //Car to be worked on
-	int workerID=0; //ID of the worker assigned to the task
+	int workerID = 0; //ID of the worker assigned to the task (LOCAL)
 	status taskStatus; //Status of the task
 	priority taskPriority; //Priority of the task
+
+
+	std::string workerFirebaseKey = ""; //ID of the worker assigned to the task (DATABASE)
+	std::string carFirebaseKey = ""; // ID of the car assigned to the task (DATABASE)
+	std::string description;
+	std::string firebaseKey;
+
 };

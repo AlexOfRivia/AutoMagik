@@ -5,8 +5,8 @@
 class Worker
 {
 public:
-    Worker(); 
-    ~Worker(); 
+    Worker();
+    ~Worker();
 
     //Setters
     void setWorkerID(int id);
@@ -15,9 +15,11 @@ public:
     void setWorkerSalary(int salary);
     void setWorkerExperience(int experience);
     void setWorkerAge(int age);
-    void setClockedIn(bool status); 
+    void setClockedIn(bool status);
     void assignTask(const Task& task); //For assigning later
     void clearTask();                  //For clearing task assignment
+    void setFirebaseKey(const std::string& key);
+    void setEmail(const std::string& email);
 
     //Getters 
     int getWorkerID() const;
@@ -28,10 +30,13 @@ public:
     int getWorkerAge() const;
     bool isClockedIn() const;
     std::string getAssignedTaskInfo() const; //Get task info
+    std::string getFirebaseKey() const;
+    std::string getEmail() const;
 
 
 private:
     int workerID = 0; //ID of the worker
+    std::string email;
     bool clockedIn; //Clocked in status
     std::string workerName; //Name of the worker
     std::string position; //Position of the worker
@@ -40,4 +45,5 @@ private:
     int workerAge; //Age of the worker
     Task assignedTask; //Task assigned to the worker
     bool hasTask = false; //Flag to check if a task is assigned
+    std::string firebaseKey;
 };
