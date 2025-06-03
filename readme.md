@@ -76,7 +76,7 @@ Each mode unlocks a distinct set of functions, as detailed below.
 
 4. **System Administration**  
    - Oversee data integrity and consistency  
-   - Manage application configuration (e.g., Firebase endpoints, API keys)  
+   - Manage application configuration (e.g., Firebase endpoints)  
    - Access all comments and log entries in the system  
 
 ### Worker Functions
@@ -136,7 +136,6 @@ Below is a brief overview of each main interface screen:
   - Vehicle Make & Model  
   - License Plate / VIN  
   - Contact Information  
-  - Optional: Link to external vehicle data API for specifications  
 - Actions:  
   - **Add Vehicle (New Client)**  
   - **Edit Vehicle Details**  
@@ -211,7 +210,7 @@ Before installing and building AutoMagik, ensure you have the following installe
 5. **Firebase Account & Project**  
    - Create a Firebase project at [console.firebase.google.com](https://console.firebase.google.com).  
    - Enable **Realtime Database** (or Firestore, if you adapt the code).  
-   - Generate a Web/App config snippet (API Key, Auth Domain, Database URL).  
+   - Generate a Web/App config snippet (Auth Domain, Database URL).  
    - Download the `google-services.json` (Android) or `GoogleService-Info.plist` (iOS) if you plan to test on those platforms—otherwise, we only need the REST credentials for the desktop client.
 
 6. **RapidJSON (or nlohmann/json)**  
@@ -230,7 +229,6 @@ Before installing and building AutoMagik, ensure you have the following installe
 2. **Configure Firebase Credentials**					
    Rename config/firebase.example.json to config/firebase.json.
    Open config/firebase.json and paste your Firebase project’s:
-       apiKey
        authDomain
        databaseURL
        projectId
@@ -241,7 +239,6 @@ Before installing and building AutoMagik, ensure you have the following installe
 Example:
 ```json
 {
-  "apiKey": "YOUR_API_KEY_HERE",
   "authDomain": "your-project.firebaseapp.com",
   "databaseURL": "https://your-project.firebaseio.com",
   "projectId": "your-project",
