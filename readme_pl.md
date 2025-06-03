@@ -1,4 +1,4 @@
-﻿# AutoMagik - aplikacja internetowa dla warsztatu samochodowego
+﻿# AutoMagik - natywna aplikacja komputerowa dla warsztatu samochodowego
 
 ## AutoMagik to w pełni funkcjonalny projekt przykładowy napisany w C++ z użyciem Qt, zaprojektowany, aby wspierać zarządzanie lokalnym warsztatem napraw samochodowych. Udostępnia interfejs klienta desktopowego dla pracowników warsztatu (menedżerów i pracowników) do obsługi zleceń serwisowych, komunikacji wewnętrznej oraz zbierania danych pojazdów. Backend jest oparty na Firebase, zapewniając synchronizację w czasie rzeczywistym i przechowywanie w chmurze.
 
@@ -32,7 +32,7 @@ Celem AutoMagik jest przedstawienie założeń i specyfikacji wersji 1.0 aplikac
 - Komunikację wewnętrzną za pomocą komentarzy przypisanych do zadań  
 - Synchronizację wszystkich informacji w czasie rzeczywistym poprzez backend Firebase  
 
-Dostęp do systemu mają wyłącznie autoryzowani użytkownicy (pracownicy warsztatu z aktywnymi kontami). Aplikacja wymaga aktywnego połączenia z internetem, aby synchronizować się z Firebase i komunikować się z zewnętrznymi API pojazdów.
+Dostęp do systemu mają wyłącznie autoryzowani użytkownicy (pracownicy warsztatu z aktywnymi kontami). Aplikacja wymaga aktywnego połączenia z internetem, aby synchronizować się z Firebase.
 
 ---
 
@@ -42,7 +42,6 @@ Dostęp do systemu mają wyłącznie autoryzowani użytkownicy (pracownicy warsz
 - C++ 17  
 - Qt 6 (Qt Widgets)  
 - Firebase Realtime Database (klient SDK)  
-- Google Vehicle Data API (opcjonalna integracja)
 
 ## Kluczowe Funkcje
 
@@ -72,12 +71,11 @@ Każdy tryb odblokowuje inny zestaw funkcji, opisany poniżej.
 3. **Zarządzanie Pojazdami i Klientami**  
    - Dodawanie, edycja lub usuwanie rekordów pojazdów (każdy pojazd reprezentuje jednego klienta)  
    - Przegląd historii klienta i powiązanych zadań  
-   - Załączanie szczegółów pojazdu (marka, model, numer rejestracyjny, VIN itp.)  
-   - Opcjonalnie pobieranie dodatkowych specyfikacji pojazdu za pomocą zewnętrznego API  
+   - Załączanie szczegółów pojazdu (marka, model, numer rejestracyjny, VIN itp.)   
 
 4. **Administracja Systemem**  
    - Nadzór nad integralnością i spójnością danych  
-   - Zarządzanie konfiguracją aplikacji (np. punkty końcowe Firebase, klucze API)  
+   - Zarządzanie konfiguracją aplikacji (np. punkty końcowe Firebase)  
    - Dostęp do wszystkich komentarzy i wpisów w dzienniku systemowym  
 
 ### Funkcje Pracownika
@@ -136,8 +134,7 @@ Poniżej znajduje się krótki opis każdego z głównych ekranów interfejsu:
   - Imię i nazwisko właściciela  
   - Marka i model pojazdu  
   - Numer rejestracyjny / VIN  
-  - Dane kontaktowe  
-  - Opcjonalnie: odnośnik do zewnętrznego API danych pojazdu dla dodatkowych specyfikacji  
+  - Dane kontaktowe   
 - Dostępne akcje:  
   - **Dodaj Pojazd (Nowy Klient)**  
   - **Edytuj Dane Pojazdu**  
@@ -213,7 +210,7 @@ Zanim zainstalujesz i zbudujesz AutoMagik, upewnij się, że na systemie masz za
 5. **Konto Firebase i Projekt**  
    - Utwórz projekt Firebase na [console.firebase.google.com](https://console.firebase.google.com).  
    - Włącz **Realtime Database** (lub Firestore, jeśli dostosujesz kod).  
-   - Wygeneruj fragment konfiguracji Web/App (API Key, Auth Domain, Database URL).  
+   - Wygeneruj fragment konfiguracji Web/App (Auth Domain, Database URL).  
    - Pobierz plik `google-services.json` (Android) lub `GoogleService-Info.plist` (iOS) jeśli planujesz testy na tych platformach — w przeciwnym razie potrzebujemy jedynie poświadczeń REST do klienta desktopowego.
 
 6. **RapidJSON (lub nlohmann/json)**  
@@ -232,7 +229,6 @@ Zanim zainstalujesz i zbudujesz AutoMagik, upewnij się, że na systemie masz za
 2. **Skonfiguruj Poświadczenia Firebase**					
    Zmień nazwę pliku config/firebase.example.json na config/firebase.json.
    Otwórz config/firebase.json i wklej dane swojego projektu Firebase:
-       apiKey
        authDomain
        databaseURL
        projectId
@@ -243,7 +239,6 @@ Zanim zainstalujesz i zbudujesz AutoMagik, upewnij się, że na systemie masz za
 Przykład:
 ```json
 {
-  "apiKey": "YOUR_API_KEY_HERE",
   "authDomain": "your-project.firebaseapp.com",
   "databaseURL": "https://your-project.firebaseio.com",
   "projectId": "your-project",
