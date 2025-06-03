@@ -766,6 +766,7 @@ void AutoMagik::addTask()
             newTask.getTaskID()
         );
     }
+    updateManagerTables();
 }
 
 //Add New Car
